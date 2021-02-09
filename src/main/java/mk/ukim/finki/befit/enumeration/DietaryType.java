@@ -1,4 +1,4 @@
-package mk.ukim.finki.befit.model.enumeration;
+package mk.ukim.finki.befit.enumeration;
 
 public enum DietaryType {
     CARNIVORE,

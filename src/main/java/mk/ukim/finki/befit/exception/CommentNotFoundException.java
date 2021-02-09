@@ -1,4 +1,4 @@
-package mk.ukim.finki.befit.model.exception;
+package mk.ukim.finki.befit.exception;
 
 public class CommentNotFoundException extends RuntimeException {
     public CommentNotFoundException(Long id) {

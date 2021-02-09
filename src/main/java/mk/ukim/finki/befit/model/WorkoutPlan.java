@@ -2,9 +2,9 @@ package mk.ukim.finki.befit.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import mk.ukim.finki.befit.model.enumeration.BodyPart;
-import mk.ukim.finki.befit.model.enumeration.MuscleGroup;
-import mk.ukim.finki.befit.model.enumeration.WorkoutType;
+import mk.ukim.finki.befit.enumeration.BodyPart;
+import mk.ukim.finki.befit.enumeration.MuscleGroup;
+import mk.ukim.finki.befit.enumeration.WorkoutType;
 
 import javax.persistence.*;
 import java.util.ArrayList;

@@ -2,8 +2,8 @@ package mk.ukim.finki.befit.web;
 
 import mk.ukim.finki.befit.model.Article;
 import mk.ukim.finki.befit.model.Comment;
-import mk.ukim.finki.befit.model.exception.ArticleNotFoundException;
-import mk.ukim.finki.befit.model.exception.CommentNotFoundException;
+import mk.ukim.finki.befit.exception.ArticleNotFoundException;
+import mk.ukim.finki.befit.exception.CommentNotFoundException;
 import mk.ukim.finki.befit.service.ArticleService;
 import mk.ukim.finki.befit.service.CommentService;
 import org.springframework.web.bind.annotation.*;
@@ -32,8 +32,8 @@ public class ForumController {
         return this.articleService.save(article);
     }
 
-    @PostMapping("/articles/{id}/edit")
-    public Article editArticle(@PathVariable Article article) {
+    @PostMapping("/articles/edit")
+    public Article editArticle(@RequestBody Article article) {
         try {
             return this.articleService.edit(article);
         } catch (ArticleNotFoundException e) {

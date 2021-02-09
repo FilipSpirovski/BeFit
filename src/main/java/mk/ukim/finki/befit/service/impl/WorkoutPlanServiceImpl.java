@@ -1,7 +1,7 @@
 package mk.ukim.finki.befit.service.impl;
 
 import mk.ukim.finki.befit.model.WorkoutPlan;
-import mk.ukim.finki.befit.model.exception.WorkoutPlanNotFoundException;
+import mk.ukim.finki.befit.exception.WorkoutPlanNotFoundException;
 import mk.ukim.finki.befit.repository.ReviewRepository;
 import mk.ukim.finki.befit.repository.WorkoutPlanRepository;
 import mk.ukim.finki.befit.service.WorkoutPlanService;

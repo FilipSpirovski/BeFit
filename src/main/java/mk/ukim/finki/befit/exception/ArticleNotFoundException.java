@@ -1,4 +1,4 @@
-package mk.ukim.finki.befit.model.exception;
+package mk.ukim.finki.befit.exception;
 
 public class ArticleNotFoundException extends RuntimeException {
     public ArticleNotFoundException(Long id) {

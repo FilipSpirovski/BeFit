@@ -1,9 +1,9 @@
 package mk.ukim.finki.befit.web;
 
 import mk.ukim.finki.befit.model.Meal;
-import mk.ukim.finki.befit.model.enumeration.DietaryType;
-import mk.ukim.finki.befit.model.enumeration.MealType;
-import mk.ukim.finki.befit.model.exception.MealNotFoundException;
+import mk.ukim.finki.befit.enumeration.DietaryType;
+import mk.ukim.finki.befit.enumeration.MealType;
+import mk.ukim.finki.befit.exception.MealNotFoundException;
 import mk.ukim.finki.befit.service.MealService;
 import org.springframework.web.bind.annotation.*;
 

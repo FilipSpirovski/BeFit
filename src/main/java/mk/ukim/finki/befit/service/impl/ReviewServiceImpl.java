@@ -1,7 +1,7 @@
 package mk.ukim.finki.befit.service.impl;
 
 import mk.ukim.finki.befit.model.Review;
-import mk.ukim.finki.befit.model.exception.ReviewNotFoundException;
+import mk.ukim.finki.befit.exception.ReviewNotFoundException;
 import mk.ukim.finki.befit.repository.ReviewRepository;
 import mk.ukim.finki.befit.service.ReviewService;
 import org.springframework.stereotype.Service;

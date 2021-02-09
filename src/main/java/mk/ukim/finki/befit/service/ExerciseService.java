@@ -1,7 +1,7 @@
 package mk.ukim.finki.befit.service;
 
 import mk.ukim.finki.befit.model.Exercise;
-import mk.ukim.finki.befit.model.enumeration.MuscleGroup;
+import mk.ukim.finki.befit.enumeration.MuscleGroup;
 
 import java.util.List;
 

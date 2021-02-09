@@ -1,7 +1,7 @@
 package mk.ukim.finki.befit.service.impl;
 
 import mk.ukim.finki.befit.model.Comment;
-import mk.ukim.finki.befit.model.exception.CommentNotFoundException;
+import mk.ukim.finki.befit.exception.CommentNotFoundException;
 import mk.ukim.finki.befit.repository.CommentRepository;
 import mk.ukim.finki.befit.service.CommentService;
 import org.springframework.stereotype.Service;
