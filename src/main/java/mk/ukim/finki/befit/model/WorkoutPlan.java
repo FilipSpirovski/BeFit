@@ -17,13 +17,15 @@ import java.util.List;
 public class WorkoutPlan {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String email;
 
+    @Column(length = 1000)
     private String title;
 
+    @Column(length = 8000)
     private String description;
 
     @Enumerated(value = EnumType.STRING)

@@ -13,7 +13,7 @@ import java.util.List;
 public class ExerciseWrapper {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne
@@ -21,12 +21,11 @@ public class ExerciseWrapper {
 
     private Integer numberOfSets;
 
-    @ElementCollection()
-    private List<Integer> repsPerSet;
+    private Integer numberOfReps;
 
-    public ExerciseWrapper(Exercise exercise, Integer numberOfSets, List<Integer> repsPerSet) {
+    public ExerciseWrapper(Exercise exercise, Integer numberOfSets, Integer numberOfReps) {
         this.exercise = exercise;
         this.numberOfSets = numberOfSets;
-        this.repsPerSet = repsPerSet;
+        this.numberOfReps = numberOfReps;
     }
 }

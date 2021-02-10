@@ -14,7 +14,7 @@ import java.util.List;
 public class Article {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(length = 4000)
@@ -28,6 +28,8 @@ public class Article {
 
     private LocalDateTime submissionTime;
 
+    private Integer views;
+
     @OneToMany
     private List<Comment> comments;
 
@@ -36,5 +38,9 @@ public class Article {
         this.description = description;
         this.submitter = submitter;
         this.submissionTime = LocalDateTime.now();
+    }
+
+    public void click() {
+        views += 1;
     }
 }

@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface WorkoutPlanRepository extends JpaRepository<WorkoutPlan, Long> {
-    List<WorkoutPlan> findAllByUsername(String username);
+    List<WorkoutPlan> findAllByEmail(String email);
 
     List<WorkoutPlan> findAllByWorkoutType(WorkoutType workoutType);
 

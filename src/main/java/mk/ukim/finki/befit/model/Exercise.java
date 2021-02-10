@@ -13,19 +13,24 @@ import javax.persistence.*;
 public class Exercise {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 1000)
     private String name;
 
+    @Column(length = 8000)
     private String description;
 
     @Enumerated(value = EnumType.STRING)
     private MuscleGroup muscleGroup;
 
-    public Exercise(String name, String description, MuscleGroup muscleGroup) {
+    private Boolean equipment;
+
+    public Exercise(String name, String description, MuscleGroup muscleGroup, Boolean equipment) {
         this.name = name;
         this.description = description;
         this.muscleGroup = muscleGroup;
+        this.equipment = equipment;
     }
 }

@@ -4,12 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import mk.ukim.finki.befit.model.enumeration.UserRole;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -17,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "befit_users")
-public class User implements UserDetails {
+public class User {
 
     @Id
     private String email;
@@ -38,39 +34,6 @@ public class User implements UserDetails {
 
     @ManyToMany
     private List<Meal> favoriteMeals;
-
-    private boolean isAccountNonExpired = true;
-
-    private boolean isAccountNonLocked = true;
-
-    private boolean isCredentialsNonExpired = true;
-
-    private boolean isEnabled = true;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(role);
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return isAccountNonExpired;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return isAccountNonLocked;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return isCredentialsNonExpired;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return isEnabled;
-    }
 
     public User(String email, String password) {
         this.email = email;

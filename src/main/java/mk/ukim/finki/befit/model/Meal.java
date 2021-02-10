@@ -16,9 +16,10 @@ import java.util.List;
 public class Meal {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 1000)
     private String title;
 
     private String email;
