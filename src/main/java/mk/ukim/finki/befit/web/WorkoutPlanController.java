@@ -1,7 +1,7 @@
 package mk.ukim.finki.befit.web;
 
 import mk.ukim.finki.befit.model.WorkoutPlan;
-import mk.ukim.finki.befit.exception.WorkoutPlanNotFoundException;
+import mk.ukim.finki.befit.model.exception.WorkoutPlanNotFoundException;
 import mk.ukim.finki.befit.service.WorkoutPlanService;
 import org.springframework.web.bind.annotation.*;
 

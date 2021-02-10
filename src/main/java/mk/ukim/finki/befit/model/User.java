@@ -3,7 +3,7 @@ package mk.ukim.finki.befit.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import mk.ukim.finki.befit.enumeration.UserRole;
+import mk.ukim.finki.befit.model.enumeration.UserRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

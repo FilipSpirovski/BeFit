@@ -1,8 +1,8 @@
 package mk.ukim.finki.befit.service;
 
 import mk.ukim.finki.befit.model.Meal;
-import mk.ukim.finki.befit.enumeration.DietaryType;
-import mk.ukim.finki.befit.enumeration.MealType;
+import mk.ukim.finki.befit.model.enumeration.DietaryType;
+import mk.ukim.finki.befit.model.enumeration.MealType;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package mk.ukim.finki.befit.service.impl;
 
 import mk.ukim.finki.befit.model.WorkoutPlan;
-import mk.ukim.finki.befit.exception.WorkoutPlanNotFoundException;
+import mk.ukim.finki.befit.model.exception.WorkoutPlanNotFoundException;
 import mk.ukim.finki.befit.repository.ReviewRepository;
 import mk.ukim.finki.befit.repository.WorkoutPlanRepository;
 import mk.ukim.finki.befit.service.WorkoutPlanService;
@@ -39,7 +39,6 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
     public WorkoutPlan edit(WorkoutPlan workoutPlan) {
         WorkoutPlan existingWorkoutPlan = this.findById(workoutPlan.getId());
 
-        existingWorkoutPlan.setUsername(workoutPlan.getUsername());
         existingWorkoutPlan.setDescription(workoutPlan.getDescription());
         existingWorkoutPlan.setWorkoutType(workoutPlan.getWorkoutType());
         existingWorkoutPlan.setEquipment((workoutPlan.getEquipment()));

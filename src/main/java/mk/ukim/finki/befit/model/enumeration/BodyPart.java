@@ -1,4 +1,4 @@
-package mk.ukim.finki.befit.enumeration;
+package mk.ukim.finki.befit.model.enumeration;
 
 public enum BodyPart {
     FULL_BODY,

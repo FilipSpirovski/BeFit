@@ -2,7 +2,7 @@ package mk.ukim.finki.befit.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import mk.ukim.finki.befit.enumeration.MuscleGroup;
+import mk.ukim.finki.befit.model.enumeration.MuscleGroup;
 
 import javax.persistence.*;
 

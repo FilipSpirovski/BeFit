@@ -1,9 +1,9 @@
 package mk.ukim.finki.befit.repository;
 
 import mk.ukim.finki.befit.model.WorkoutPlan;
-import mk.ukim.finki.befit.enumeration.BodyPart;
-import mk.ukim.finki.befit.enumeration.MuscleGroup;
-import mk.ukim.finki.befit.enumeration.WorkoutType;
+import mk.ukim.finki.befit.model.enumeration.BodyPart;
+import mk.ukim.finki.befit.model.enumeration.MuscleGroup;
+import mk.ukim.finki.befit.model.enumeration.WorkoutType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

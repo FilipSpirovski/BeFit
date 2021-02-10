@@ -1,7 +1,7 @@
 package mk.ukim.finki.befit.service.impl;
 
 import mk.ukim.finki.befit.model.Article;
-import mk.ukim.finki.befit.exception.ArticleNotFoundException;
+import mk.ukim.finki.befit.model.exception.ArticleNotFoundException;
 import mk.ukim.finki.befit.repository.ArticleRepository;
 import mk.ukim.finki.befit.repository.CommentRepository;
 import mk.ukim.finki.befit.service.ArticleService;

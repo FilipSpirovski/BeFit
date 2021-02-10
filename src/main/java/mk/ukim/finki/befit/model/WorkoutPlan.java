@@ -2,9 +2,9 @@ package mk.ukim.finki.befit.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import mk.ukim.finki.befit.enumeration.BodyPart;
-import mk.ukim.finki.befit.enumeration.MuscleGroup;
-import mk.ukim.finki.befit.enumeration.WorkoutType;
+import mk.ukim.finki.befit.model.enumeration.BodyPart;
+import mk.ukim.finki.befit.model.enumeration.MuscleGroup;
+import mk.ukim.finki.befit.model.enumeration.WorkoutType;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -20,7 +20,9 @@ public class WorkoutPlan {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String username;
+    private String email;
+
+    private String title;
 
     private String description;
 
@@ -42,8 +44,8 @@ public class WorkoutPlan {
     @OneToMany
     private List<Review> reviews;
 
-    public WorkoutPlan(String username, String description, WorkoutType workoutType, Boolean equipment, BodyPart bodyPart) {
-        this.username = username;
+    public WorkoutPlan(String email, String description, WorkoutType workoutType, Boolean equipment, BodyPart bodyPart) {
+        this.email = email;
         this.description = description;
         this.workoutType = workoutType;
         this.equipment = equipment;

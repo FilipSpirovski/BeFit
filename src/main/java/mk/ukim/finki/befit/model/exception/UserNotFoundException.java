@@ -1,4 +1,4 @@
-package mk.ukim.finki.befit.exception;
+package mk.ukim.finki.befit.model.exception;
 
 public class UserNotFoundException extends RuntimeException {
     public UserNotFoundException(String email) {

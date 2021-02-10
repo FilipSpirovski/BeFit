@@ -2,8 +2,8 @@ package mk.ukim.finki.befit.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import mk.ukim.finki.befit.enumeration.DietaryType;
-import mk.ukim.finki.befit.enumeration.MealType;
+import mk.ukim.finki.befit.model.enumeration.DietaryType;
+import mk.ukim.finki.befit.model.enumeration.MealType;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ public class Meal {
 
     private String title;
 
-    private String username;
+    private String email;
 
     @ElementCollection()
     @Enumerated(value = EnumType.STRING)
@@ -48,10 +48,10 @@ public class Meal {
     @OneToMany
     private List<Review> reviews;
 
-    public Meal(String title, String username, List<MealType> mealTypes, DietaryType dietaryType, Integer preparationTime,
+    public Meal(String title, String email, List<MealType> mealTypes, DietaryType dietaryType, Integer preparationTime,
                 Integer cookingTime, Integer servings, String description, String ingredients, String preparation) {
         this.title = title;
-        this.username = username;
+        this.email = email;
         this.mealTypes = mealTypes;
         this.dietaryType = dietaryType;
         this.preparationTime = preparationTime;
