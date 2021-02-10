@@ -11,5 +11,13 @@ import java.util.List;
 
 @Repository
 public interface MealRepository extends JpaRepository<Meal, Long>, JpaSpecificationExecutor<Meal> {
+    List<Meal> findAllByMealTypesContaining(MealType mealType);
 
+    List<Meal> findAllByDietaryType(DietaryType dietaryType);
+
+    List<Meal> findAllByPreparationTimeLessThanEqual(Integer preparationTime);
+
+    List<Meal> findAllByCookingTimeLessThanEqual(Integer cookingTime);
+
+    List<Meal> findAllByServingsLessThanEqual(Integer servings);
 }
