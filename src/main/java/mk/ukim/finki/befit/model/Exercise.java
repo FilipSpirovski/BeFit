@@ -19,17 +19,17 @@ public class Exercise {
     @Column(length = 1000)
     private String name;
 
-    @Column(length = 8000)
-    private String description;
+    @OneToOne
+    private Image image;
 
     @Enumerated(value = EnumType.STRING)
     private MuscleGroup muscleGroup;
 
     private Boolean equipment;
 
-    public Exercise(String name, String description, MuscleGroup muscleGroup, Boolean equipment) {
+    public Exercise(String name, Image image, MuscleGroup muscleGroup, Boolean equipment) {
         this.name = name;
-        this.description = description;
+        this.image = image;
         this.muscleGroup = muscleGroup;
         this.equipment = equipment;
     }

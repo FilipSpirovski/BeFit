@@ -6,6 +6,7 @@ import mk.ukim.finki.befit.model.enumeration.DietaryType;
 import mk.ukim.finki.befit.model.enumeration.MealType;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +24,11 @@ public class Meal {
     private String title;
 
     private String email;
+
+    @OneToOne
+    private Image image;
+
+    private LocalDateTime submissionTime;
 
     @ElementCollection()
     @Enumerated(value = EnumType.STRING)
@@ -49,10 +55,13 @@ public class Meal {
     @OneToMany
     private List<Review> reviews;
 
-    public Meal(String title, String email, List<MealType> mealTypes, DietaryType dietaryType, Integer preparationTime,
-                Integer cookingTime, Integer servings, String description, String ingredients, String preparation) {
+    public Meal(String title, String email, Image image, List<MealType> mealTypes, DietaryType dietaryType,
+                Integer preparationTime, Integer cookingTime, Integer servings, String description,
+                String ingredients, String preparation) {
         this.title = title;
         this.email = email;
+        this.image = image;
+        this.submissionTime = LocalDateTime.now();
         this.mealTypes = mealTypes;
         this.dietaryType = dietaryType;
         this.preparationTime = preparationTime;

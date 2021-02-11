@@ -34,25 +34,48 @@ public class MealController {
         return this.mealService.findAllByDietaryType(DietaryType.valueOf(dietaryType));
     }
 
+    @GetMapping("/{id}")
+    public Meal getMeal(@PathVariable Long id) {
+        try {
+            return this.mealService.findById(id);
+        } catch (MealNotFoundException e) {
+            System.out.println(e.getMessage());
+
+            return null;
+        }
+    }
+
     @PostMapping("/add")
     public Meal addMeal(@RequestBody Meal meal) {
         return this.mealService.save(meal);
     }
 
-    @PostMapping("/{id}/favorites-add")
+    @PostMapping("/{id}/add-to-favorites")
     public Meal addToFavorites(@PathVariable Long id) {
-        Meal meal = this.mealService.findById(id);
-        // TODO: Find the user that is currently logged in.
+        try {
+            Meal meal = this.mealService.findById(id);
+            // TODO: Find the user that is currently logged in.
 
-        return meal;
+            return meal;
+        } catch (MealNotFoundException e) {
+            System.out.println(e.getMessage());
+
+            return null;
+        }
     }
 
-    @PostMapping("/{id}/favorites-remove")
+    @PostMapping("/{id}/remove-from-favorites")
     public Meal removeFromFavorites(@PathVariable Long id) {
-        Meal meal = this.mealService.findById(id);
-        // TODO: Find the user that is currently logged in.
+        try {
+            Meal meal = this.mealService.findById(id);
+            // TODO: Find the user that is currently logged in.
 
-        return meal;
+            return meal;
+        } catch (MealNotFoundException e) {
+            System.out.println(e.getMessage());
+
+            return null;
+        }
     }
 
     @PostMapping("/edit")

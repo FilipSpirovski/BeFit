@@ -22,25 +22,48 @@ public class WorkoutPlanController {
         return this.workoutPlanService.findAll();
     }
 
+    @GetMapping("/{id}")
+    public WorkoutPlan getWorkoutPlan(@PathVariable Long id) {
+        try {
+            return this.workoutPlanService.findById(id);
+        } catch (WorkoutPlanNotFoundException e) {
+            System.out.println(e.getMessage());
+
+            return null;
+        }
+    }
+
     @PostMapping("/add")
     public WorkoutPlan addWorkoutPlan(@RequestBody WorkoutPlan workoutPlan) {
         return this.workoutPlanService.save(workoutPlan);
     }
 
-    @PostMapping("/{id}/favorites-add")
+    @PostMapping("/{id}/add-to-favorites")
     public WorkoutPlan addToFavorites(@PathVariable Long id) {
-        WorkoutPlan workoutPlan = this.workoutPlanService.findById(id);
-        // TODO: Find the user that is currently logged in.
+        try {
+            WorkoutPlan workoutPlan = this.workoutPlanService.findById(id);
+            // TODO: Find the user that is currently logged in.
 
-        return workoutPlan;
+            return workoutPlan;
+        } catch (WorkoutPlanNotFoundException e) {
+            System.out.println(e.getMessage());
+
+            return null;
+        }
     }
 
-    @PostMapping("/{id}/favorites-remove")
+    @PostMapping("/{id}/remove-from-favorites")
     public WorkoutPlan removeFromFavorites(@PathVariable Long id) {
-        WorkoutPlan workoutPlan = this.workoutPlanService.findById(id);
-        // TODO: Find the user that is currently logged in.
+        try {
+            WorkoutPlan workoutPlan = this.workoutPlanService.findById(id);
+            // TODO: Find the user that is currently logged in.
 
-        return workoutPlan;
+            return workoutPlan;
+        } catch (WorkoutPlanNotFoundException e) {
+            System.out.println(e.getMessage());
+
+            return null;
+        }
     }
 
     @PostMapping("/edit")

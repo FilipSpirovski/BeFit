@@ -7,6 +7,7 @@ import mk.ukim.finki.befit.model.enumeration.MuscleGroup;
 import mk.ukim.finki.befit.model.enumeration.WorkoutType;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +29,11 @@ public class WorkoutPlan {
     @Column(length = 8000)
     private String description;
 
+    @ManyToOne
+    private Image image;
+
+    private LocalDateTime submissionTime;
+
     @Enumerated(value = EnumType.STRING)
     private WorkoutType workoutType;
 
@@ -46,9 +52,13 @@ public class WorkoutPlan {
     @OneToMany
     private List<Review> reviews;
 
-    public WorkoutPlan(String email, String description, WorkoutType workoutType, Boolean equipment, BodyPart bodyPart) {
+    public WorkoutPlan(String email, String title, String description, Image image,
+                       WorkoutType workoutType, Boolean equipment, BodyPart bodyPart) {
         this.email = email;
+        this.title = title;
+        this.image = image;
         this.description = description;
+        this.submissionTime = LocalDateTime.now();
         this.workoutType = workoutType;
         this.equipment = equipment;
         this.bodyPart = bodyPart;
