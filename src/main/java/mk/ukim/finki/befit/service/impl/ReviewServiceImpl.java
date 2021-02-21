@@ -32,7 +32,7 @@ public class ReviewServiceImpl implements ReviewService {
         existingReview.setScore(review.getScore());
         existingReview.setDescription(review.getDescription());
 
-        return existingReview;
+        return this.reviewRepository.save(existingReview);
     }
 
     @Override

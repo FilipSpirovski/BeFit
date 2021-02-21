@@ -57,8 +57,9 @@ public class MealServiceImpl implements MealService {
         existingMeal.setDescription(meal.getDescription());
         existingMeal.setIngredients(meal.getIngredients());
         existingMeal.setPreparation(meal.getPreparation());
+        existingMeal.setReviews(meal.getReviews());
 
-        return existingMeal;
+        return this.mealRepository.save(existingMeal);
     }
 
     @Override

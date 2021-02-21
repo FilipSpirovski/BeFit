@@ -3,6 +3,7 @@ package mk.ukim.finki.befit.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import mk.ukim.finki.befit.model.enumeration.MuscleGroup;
+import mk.ukim.finki.befit.model.enumeration.WorkoutType;
 
 import javax.persistence.*;
 
@@ -19,11 +20,14 @@ public class Exercise {
     @Column(length = 1000)
     private String name;
 
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.ALL})
     private Image image;
 
     @Enumerated(value = EnumType.STRING)
     private MuscleGroup muscleGroup;
+
+    @Enumerated(value = EnumType.STRING)
+    private WorkoutType workoutType;
 
     private Boolean equipment;
 

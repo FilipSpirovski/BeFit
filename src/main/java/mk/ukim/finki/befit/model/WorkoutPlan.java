@@ -21,7 +21,7 @@ public class WorkoutPlan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String email;
+    private String username;
 
     @Column(length = 1000)
     private String title;
@@ -29,7 +29,7 @@ public class WorkoutPlan {
     @Column(length = 8000)
     private String description;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Image image;
 
     private LocalDateTime submissionTime;
@@ -46,15 +46,15 @@ public class WorkoutPlan {
     @Enumerated(value = EnumType.STRING)
     private List<MuscleGroup> muscleGroups;
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.ALL})
     private List<ExerciseWrapper> exercises;
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.ALL})
     private List<Review> reviews;
 
-    public WorkoutPlan(String email, String title, String description, Image image,
+    public WorkoutPlan(String username, String title, String description, Image image,
                        WorkoutType workoutType, Boolean equipment, BodyPart bodyPart) {
-        this.email = email;
+        this.username = username;
         this.title = title;
         this.image = image;
         this.description = description;
@@ -65,5 +65,15 @@ public class WorkoutPlan {
         this.muscleGroups = new ArrayList<>();
         this.exercises = new ArrayList<>();
         this.reviews = new ArrayList<>();
+    }
+
+    public Integer getRating() {
+        if (reviews == null || reviews.isEmpty()) {
+            return 0;
+        } else {
+            return (int) reviews.stream()
+                    .mapToInt(Review::getScore)
+                    .average().getAsDouble();
+        }
     }
 }

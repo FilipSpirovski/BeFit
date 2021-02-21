@@ -30,7 +30,7 @@ public class Article {
 
     private Integer views;
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.ALL})
     private List<Comment> comments;
 
     public Article(String title, String description, User submitter) {

@@ -11,6 +11,8 @@ import mk.ukim.finki.befit.service.ReviewService;
 import mk.ukim.finki.befit.service.WorkoutPlanService;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 @RestController
 @RequestMapping("/reviews")
 @CrossOrigin("http://localhost:4200")
@@ -27,11 +29,12 @@ public class ReviewController {
 
     @PostMapping("/add/workout-plan/{id}")
     public Review addReviewForWorkoutPlan(@PathVariable Long id, @RequestBody Review review) {
-        review = this.reviewService.save(review);
-
         try {
             WorkoutPlan workoutPlan = this.workoutPlanService.findById(id);
+
+            review.setSubmissionTime(LocalDateTime.now());
             workoutPlan.getReviews().add(review);
+            this.workoutPlanService.edit(workoutPlan);
 
             return review;
         } catch (WorkoutPlanNotFoundException e) {
@@ -43,11 +46,12 @@ public class ReviewController {
 
     @PostMapping("/add/meal/{id}")
     public Review addReviewForMeal(@PathVariable Long id, @RequestBody Review review) {
-        review = this.reviewService.save(review);
-
         try {
             Meal meal = this.mealService.findById(id);
+
+            review.setSubmissionTime(LocalDateTime.now());
             meal.getReviews().add(review);
+            this.mealService.edit(meal);
 
             return review;
         } catch (MealNotFoundException e) {

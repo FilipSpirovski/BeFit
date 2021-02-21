@@ -25,7 +25,7 @@ public class Meal {
 
     private String email;
 
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.ALL})
     private Image image;
 
     private LocalDateTime submissionTime;
@@ -52,8 +52,8 @@ public class Meal {
     @Column(length = 8000)
     private String preparation;
 
-    @OneToMany
-    private List<Review> reviews;
+    @OneToMany(cascade = {CascadeType.ALL})
+    private List<Review> reviews = new ArrayList<>();
 
     public Meal(String title, String email, Image image, List<MealType> mealTypes, DietaryType dietaryType,
                 Integer preparationTime, Integer cookingTime, Integer servings, String description,
@@ -70,6 +70,15 @@ public class Meal {
         this.description = description;
         this.ingredients = ingredients;
         this.preparation = preparation;
-        this.reviews = new ArrayList<>();
+    }
+
+    public Integer getRating() {
+        if (reviews == null || reviews.isEmpty()) {
+            return 0;
+        } else {
+            return (int) reviews.stream()
+                    .mapToInt(Review::getScore)
+                    .average().getAsDouble();
+        }
     }
 }

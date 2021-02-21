@@ -8,6 +8,7 @@ import mk.ukim.finki.befit.service.ArticleService;
 import mk.ukim.finki.befit.service.CommentService;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -27,8 +28,33 @@ public class ForumController {
         return this.articleService.findAll();
     }
 
+    @GetMapping("/articles/{id}")
+    public Article getArticle(@PathVariable Long id) {
+        try {
+            Article article = this.articleService.findById(id);
+
+            article.click();
+            this.articleService.edit(article);
+
+            return article;
+        } catch (ArticleNotFoundException e) {
+            System.out.println(e.getMessage());
+
+            return null;
+        }
+    }
+
+    @PostMapping("/increment-views/{id}")
+    public void incrementViewsForArticle(@PathVariable Long id, @RequestBody Object object) {
+        Article article = this.articleService.findById(id);
+
+        article.click();
+        this.articleService.edit(article);
+    }
+
     @PostMapping("/articles/add")
     public Article addArticle(@RequestBody Article article) {
+        article.setViews(0);
         return this.articleService.save(article);
     }
 
@@ -56,12 +82,13 @@ public class ForumController {
 
     @PostMapping("/articles/{id}/add-comment")
     public Comment addCommentToArticle(@PathVariable Long id, @RequestBody Comment comment) {
-        comment = this.commentService.save(comment);
-
         try {
             Article article = this.articleService.findById(id);
 
+            comment.setSubmissionTime(LocalDateTime.now());
+            comment.setRating(0);
             article.getComments().add(comment);
+            this.articleService.edit(article);
 
             return comment;
         } catch (ArticleNotFoundException e) {
@@ -83,7 +110,7 @@ public class ForumController {
     }
 
     @PostMapping("/comments/{id}/delete")
-    public Comment deleteComment(@RequestBody Long id) {
+    public Comment deleteComment(@PathVariable Long id) {
         try {
             return this.commentService.delete(id);
         } catch (ArticleNotFoundException e) {
@@ -106,6 +133,7 @@ public class ForumController {
                     comment.downVote();
                     break;
             }
+            this.commentService.edit(comment);
 
             return comment;
         } catch (CommentNotFoundException e) {

@@ -41,8 +41,10 @@ public class ArticleServiceImpl implements ArticleService {
 
         existingArticle.setTitle(article.getTitle());
         existingArticle.setDescription(article.getDescription());
+        existingArticle.setViews(article.getViews());
+        existingArticle.setComments(article.getComments());
 
-        return existingArticle;
+        return this.articleRepository.save(existingArticle);
     }
 
     @Override

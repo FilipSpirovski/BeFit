@@ -27,7 +27,11 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Comment edit(Comment comment) {
-        return null;
+        Comment existingComment = this.findById(comment.getId());
+
+        existingComment.setText(comment.getText());
+
+        return this.commentRepository.save(existingComment);
     }
 
     @Override

@@ -47,7 +47,7 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
         existingWorkoutPlan.setExercises(workoutPlan.getExercises());
         existingWorkoutPlan.setReviews(workoutPlan.getReviews());
 
-        return existingWorkoutPlan;
+        return this.workoutPlanRepository.save(existingWorkoutPlan);
     }
 
     @Override

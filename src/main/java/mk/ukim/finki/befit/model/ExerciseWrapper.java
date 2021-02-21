@@ -16,14 +16,18 @@ public class ExerciseWrapper {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @Column(name = "temporary_dto_id")
+    private Long exerciseId;
+
+    @OneToOne(cascade = CascadeType.ALL)
     private Exercise exercise;
 
     private Integer numberOfSets;
 
     private Integer numberOfReps;
 
-    public ExerciseWrapper(Exercise exercise, Integer numberOfSets, Integer numberOfReps) {
+    public ExerciseWrapper(Long exerciseId, Exercise exercise, Integer numberOfSets, Integer numberOfReps) {
+        this.exerciseId = exerciseId;
         this.exercise = exercise;
         this.numberOfSets = numberOfSets;
         this.numberOfReps = numberOfReps;
