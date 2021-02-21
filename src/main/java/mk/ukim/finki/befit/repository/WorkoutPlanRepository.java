@@ -13,6 +13,8 @@ import java.util.List;
 
 @Repository
 public interface WorkoutPlanRepository extends JpaRepository<WorkoutPlan, Long> {
+    Page<WorkoutPlan> findAll(Pageable pageable);
+
     Page<WorkoutPlan> findAllByWorkoutTypeAndEquipmentAndBodyPartAndMuscleGroupsContaining(
             WorkoutType workoutType, Boolean equipment, BodyPart bodyPart, MuscleGroup muscleGroup, Pageable pageable
     );

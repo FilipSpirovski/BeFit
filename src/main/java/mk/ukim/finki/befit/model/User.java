@@ -29,6 +29,9 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     private UserRole role;
 
+    @Column(length = 500)
+    private String profilePictureUrl;
+
     @ManyToMany
     private List<WorkoutPlan> favoriteWorkoutPlans;
 

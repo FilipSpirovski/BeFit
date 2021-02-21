@@ -3,38 +3,64 @@ package mk.ukim.finki.befit.web;
 import com.google.gson.Gson;
 import mk.ukim.finki.befit.model.Exercise;
 import mk.ukim.finki.befit.model.Image;
-import mk.ukim.finki.befit.model.Meal;
 import mk.ukim.finki.befit.model.WorkoutPlan;
 import mk.ukim.finki.befit.model.exception.WorkoutPlanNotFoundException;
+import mk.ukim.finki.befit.repository.WorkoutPlanRepository;
 import mk.ukim.finki.befit.service.ExerciseService;
 import mk.ukim.finki.befit.service.ImageService;
 import mk.ukim.finki.befit.service.WorkoutPlanService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/workouts")
 @CrossOrigin("http://localhost:4200")
 public class WorkoutPlanController {
+    private final WorkoutPlanRepository workoutPlanRepository;
     private final WorkoutPlanService workoutPlanService;
     private final ImageService imageService;
     private final ExerciseService exerciseService;
 
-    public WorkoutPlanController(WorkoutPlanService workoutPlanService, ImageService imageService, ExerciseService exerciseService) {
+    public WorkoutPlanController(WorkoutPlanRepository workoutPlanRepository, WorkoutPlanService workoutPlanService,
+                                 ImageService imageService, ExerciseService exerciseService) {
+        this.workoutPlanRepository = workoutPlanRepository;
         this.workoutPlanService = workoutPlanService;
         this.imageService = imageService;
         this.exerciseService = exerciseService;
     }
 
     @GetMapping("/all")
-    public List<WorkoutPlan> getWorkoutPlans() {
-        return this.workoutPlanService.findAll();
+    public Map<String, Object> getWorkoutPlans(@RequestParam(defaultValue = "0") int page,
+                                               @RequestParam(defaultValue = "3") int size) {
+        Pageable paging = PageRequest.of(page, size);
+        Page<WorkoutPlan> workoutPlanPage;
+        List<WorkoutPlan> workoutPlans;
+        Map<String, Object> response = new HashMap<>();
+
+        workoutPlanPage = this.workoutPlanRepository.findAll(paging);
+        workoutPlans = workoutPlanPage.getContent();
+        response.put("workoutPlans", workoutPlans);
+        response.put("currentPage", workoutPlanPage.getNumber());
+        response.put("totalItems", workoutPlanPage.getTotalElements());
+        response.put("totalPages", workoutPlanPage.getTotalPages());
+
+        return response;
+    }
+
+    @GetMapping("/count")
+    public Integer getNumberOfWorkoutPlans() {
+        return this.workoutPlanService.findAll().size();
     }
 
     @GetMapping("/latest/{id}")

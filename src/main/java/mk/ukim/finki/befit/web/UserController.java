@@ -19,8 +19,8 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/all")
-    public List<User> getNumberOfUsers() {
-        return this.userService.findAll();
+    @GetMapping("/count")
+    public Integer getNumberOfUsers() {
+        return this.userService.getNumberOfUsers();
     }
 }

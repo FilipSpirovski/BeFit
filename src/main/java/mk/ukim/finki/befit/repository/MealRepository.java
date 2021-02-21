@@ -13,6 +13,8 @@ import java.util.List;
 
 @Repository
 public interface MealRepository extends JpaRepository<Meal, Long>, JpaSpecificationExecutor<Meal> {
+    Page<Meal> findAll(Pageable pageable);
+
     Page<Meal> findAllByMealTypesContainingAndDietaryTypeAndServings(
             MealType mealType, DietaryType dietaryType, Integer servings, Pageable pageable
     );

@@ -3,36 +3,61 @@ package mk.ukim.finki.befit.web;
 import com.google.gson.Gson;
 import mk.ukim.finki.befit.model.Image;
 import mk.ukim.finki.befit.model.Meal;
-import mk.ukim.finki.befit.model.Review;
 import mk.ukim.finki.befit.model.enumeration.DietaryType;
 import mk.ukim.finki.befit.model.enumeration.MealType;
 import mk.ukim.finki.befit.model.exception.MealNotFoundException;
+import mk.ukim.finki.befit.repository.MealRepository;
 import mk.ukim.finki.befit.service.ImageService;
 import mk.ukim.finki.befit.service.MealService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/meals")
 @CrossOrigin("http://localhost:4200")
 public class MealController {
+    private final MealRepository mealRepository;
     private final MealService mealService;
     private final ImageService imageService;
 
-    public MealController(MealService mealService, ImageService imageService) {
+    public MealController(MealRepository mealRepository, MealService mealService, ImageService imageService) {
+        this.mealRepository = mealRepository;
         this.mealService = mealService;
         this.imageService = imageService;
     }
 
     @GetMapping("/all")
-    public List<Meal> getMeals() {
-        return this.mealService.findAll();
+    public Map<String, Object> getMeals(@RequestParam(defaultValue = "0") int page,
+                                        @RequestParam(defaultValue = "3") int size) {
+        Pageable paging = PageRequest.of(page, size);
+        Page<Meal> mealPage;
+        List<Meal> meals;
+        Map<String, Object> response = new HashMap<>();
+
+        mealPage = this.mealRepository.findAll(paging);
+        meals = mealPage.getContent();
+        response.put("meals", meals);
+        response.put("currentPage", mealPage.getNumber());
+        response.put("totalItems", mealPage.getTotalElements());
+        response.put("totalPages", mealPage.getTotalPages());
+
+        return response;
+    }
+
+    @GetMapping("/count")
+    public Integer getNumberOfMeals() {
+        return this.mealService.findAll().size();
     }
 
     @GetMapping("/{mealType}/all")
