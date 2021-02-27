@@ -34,6 +34,8 @@ public class WorkoutPlan {
 
     private LocalDateTime submissionTime;
 
+//    private Double price;
+
     @Enumerated(value = EnumType.STRING)
     private WorkoutType workoutType;
 

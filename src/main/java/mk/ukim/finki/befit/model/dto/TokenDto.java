@@ -8,5 +8,5 @@ public class TokenDto {
 
     private String value;
 
-    private User user;
+    private UserDto user;
 }

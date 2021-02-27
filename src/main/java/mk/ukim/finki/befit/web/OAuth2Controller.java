@@ -4,8 +4,10 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import io.opencensus.trace.Link;
 import mk.ukim.finki.befit.model.User;
 import mk.ukim.finki.befit.model.dto.TokenDto;
+import mk.ukim.finki.befit.model.dto.UserDto;
 import mk.ukim.finki.befit.model.enumeration.UserRole;
 import mk.ukim.finki.befit.security.jwt.JwtProvider;
 import mk.ukim.finki.befit.service.UserService;
@@ -23,11 +25,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 
 @RestController
 @RequestMapping("/oauth")
 @CrossOrigin("http://localhost:4200")
-public class OAuthController {
+public class OAuth2Controller {
 
     @Value("${google.clientId}")
     String googleClientId;
@@ -40,8 +43,8 @@ public class OAuthController {
     private final JwtProvider jwtProvider;
     private final UserService userService;
 
-    public OAuthController(PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager,
-                           JwtProvider jwtProvider, UserService userService) {
+    public OAuth2Controller(PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager,
+                            JwtProvider jwtProvider, UserService userService) {
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtProvider = jwtProvider;
@@ -68,23 +71,30 @@ public class OAuthController {
     @PostMapping("/facebook")
     public ResponseEntity<TokenDto> facebook(@RequestBody TokenDto tokenDto) throws IOException {
         Facebook facebook = new FacebookTemplate(tokenDto.getValue());
-        final String[] fields = {"email", "picture"};
+        final String[] fields = {"email", "first_name", "last_name", "picture"};
         org.springframework.social.facebook.api.User facebookUser = facebook.fetchObject(
                 "me", org.springframework.social.facebook.api.User.class, fields
         );
 
-//        User user = getUser(facebookUser.getEmail());
-//        TokenDto tokenResponse = login(user);
-//
-//        return new ResponseEntity<>(tokenResponse, HttpStatus.OK);
-        return null;
+        User user = getFacebookUser(facebookUser);
+        TokenDto tokenResponse = login(user);
+
+        return new ResponseEntity<>(tokenResponse, HttpStatus.OK);
     }
 
     private User getGoogleUser(GoogleIdToken.Payload payload) {
         if (userService.existsByEmail(payload.getEmail())) {
             return userService.findByEmail(payload.getEmail());
         } else {
-            return saveUser(payload);
+            return saveGoogleUser(payload);
+        }
+    }
+
+    private User getFacebookUser(org.springframework.social.facebook.api.User facebookUser) {
+        if (userService.existsByEmail(facebookUser.getEmail())) {
+            return userService.findByEmail(facebookUser.getEmail());
+        } else {
+            return saveFacebookUser(facebookUser);
         }
     }
 
@@ -99,13 +109,15 @@ public class OAuthController {
         String jwt = jwtProvider.generateToken(authentication);
 
         TokenDto tokenDto = new TokenDto();
+        UserDto userDto = new UserDto(user);
+
         tokenDto.setValue(jwt);
-        tokenDto.setUser(user);
+        tokenDto.setUser(userDto);
 
         return tokenDto;
     }
 
-    private User saveUser(GoogleIdToken.Payload payload) {
+    private User saveGoogleUser(GoogleIdToken.Payload payload) {
         User user = new User();
 
         user.setEmail(payload.getEmail());
@@ -115,6 +127,23 @@ public class OAuthController {
         user.setSurname(payload.get("family_name").toString());
         user.setRole(UserRole.ROLE_USER);
         user.setProfilePictureUrl(payload.get("picture").toString());
+
+        return userService.register(user);
+    }
+
+    private User saveFacebookUser(org.springframework.social.facebook.api.User facebookUser) {
+        User user = new User();
+
+        user.setEmail(facebookUser.getEmail());
+        user.setUsername(facebookUser.getEmail());
+        user.setPassword(passwordEncoder.encode(secretPsw));
+        user.setName(facebookUser.getFirstName());
+        user.setSurname(facebookUser.getLastName());
+        user.setRole(UserRole.ROLE_USER);
+        LinkedHashMap<String, LinkedHashMap<String, Object>> picture = (LinkedHashMap) facebookUser
+                .getExtraData()
+                .get("picture");
+        user.setProfilePictureUrl(picture.get("data").get("url").toString());
 
         return userService.register(user);
     }

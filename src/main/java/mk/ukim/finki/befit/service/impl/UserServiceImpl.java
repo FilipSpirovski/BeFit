@@ -36,4 +36,22 @@ public class UserServiceImpl implements UserService {
     public User register(User user) {
         return this.userRepository.save(user);
     }
+
+    @Override
+    public User edit(User user) {
+        User existingUser = this.findByEmail(user.getEmail());
+
+        existingUser.setEmail(user.getEmail());
+        existingUser.setUsername(user.getUsername());
+        existingUser.setPassword(user.getPassword());
+        existingUser.setName(user.getName());
+        existingUser.setSurname(user.getSurname());
+        existingUser.setRole(user.getRole());
+        existingUser.setProfilePictureUrl(user.getProfilePictureUrl());
+        existingUser.setFavoriteWorkoutPlans(user.getFavoriteWorkoutPlans());
+        existingUser.setFavoriteMeals(user.getFavoriteMeals());
+        existingUser.setLikedComments(user.getLikedComments());
+
+        return this.userRepository.save(existingUser);
+    }
 }

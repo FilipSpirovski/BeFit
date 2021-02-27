@@ -12,4 +12,6 @@ public interface UserService {
     boolean existsByEmail(String email);
 
     User register(User user);
+
+    User edit(User user);
 }

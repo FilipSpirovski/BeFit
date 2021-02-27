@@ -1,17 +1,21 @@
 package mk.ukim.finki.befit.web;
 
 import com.google.gson.Gson;
-import mk.ukim.finki.befit.model.Exercise;
-import mk.ukim.finki.befit.model.Image;
-import mk.ukim.finki.befit.model.WorkoutPlan;
+import com.querydsl.core.types.Predicate;
+import mk.ukim.finki.befit.model.*;
+import mk.ukim.finki.befit.model.dto.UserDto;
 import mk.ukim.finki.befit.model.exception.WorkoutPlanNotFoundException;
 import mk.ukim.finki.befit.repository.WorkoutPlanRepository;
 import mk.ukim.finki.befit.service.ExerciseService;
 import mk.ukim.finki.befit.service.ImageService;
+import mk.ukim.finki.befit.service.UserService;
 import mk.ukim.finki.befit.service.WorkoutPlanService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.querydsl.binding.QuerydslPredicate;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,24 +35,56 @@ public class WorkoutPlanController {
     private final WorkoutPlanService workoutPlanService;
     private final ImageService imageService;
     private final ExerciseService exerciseService;
+    private final UserService userService;
 
     public WorkoutPlanController(WorkoutPlanRepository workoutPlanRepository, WorkoutPlanService workoutPlanService,
-                                 ImageService imageService, ExerciseService exerciseService) {
+                                 ImageService imageService, ExerciseService exerciseService, UserService userService) {
         this.workoutPlanRepository = workoutPlanRepository;
         this.workoutPlanService = workoutPlanService;
         this.imageService = imageService;
         this.exerciseService = exerciseService;
+        this.userService = userService;
     }
 
-    @GetMapping("/all")
+    @GetMapping("/all/{criteria}")
     public Map<String, Object> getWorkoutPlans(@RequestParam(defaultValue = "0") int page,
-                                               @RequestParam(defaultValue = "3") int size) {
-        Pageable paging = PageRequest.of(page, size);
+                                               @RequestParam(defaultValue = "3") int size,
+                                               @PathVariable String criteria,
+                                               @QuerydslPredicate(root = WorkoutPlan.class) Predicate predicate) {
+        Pageable paging;
+        switch (criteria) {
+            case "AlphabeticalAsc":
+                paging = PageRequest.of(page, size, Sort.by("title").ascending());
+                break;
+            case "AlphabeticalDesc":
+                paging = PageRequest.of(page, size, Sort.by("title").descending());
+                break;
+            case "PriceAsc":
+                paging = PageRequest.of(page, size, Sort.by("price").ascending());
+                break;
+            case "PriceDesc":
+                paging = PageRequest.of(page, size, Sort.by("price").descending());
+                break;
+            case "DateAsc":
+                paging = PageRequest.of(page, size, Sort.by("submissionTime").ascending());
+                break;
+            case "DateDesc":
+                paging = PageRequest.of(page, size, Sort.by("submissionTime").descending());
+                break;
+            case "RateAsc":
+                paging = PageRequest.of(page, size, Sort.by("rating").ascending());
+                break;
+            case "RateDesc":
+                paging = PageRequest.of(page, size, Sort.by("rating").descending());
+                break;
+            default:
+                paging = PageRequest.of(page, size);
+        }
         Page<WorkoutPlan> workoutPlanPage;
         List<WorkoutPlan> workoutPlans;
         Map<String, Object> response = new HashMap<>();
 
-        workoutPlanPage = this.workoutPlanRepository.findAll(paging);
+        workoutPlanPage = this.workoutPlanRepository.findAll(predicate, paging);
         workoutPlans = workoutPlanPage.getContent();
         response.put("workoutPlans", workoutPlans);
         response.put("currentPage", workoutPlanPage.getNumber());
@@ -96,7 +132,8 @@ public class WorkoutPlanController {
 
     @PostMapping("/add")
     public WorkoutPlan addWorkoutPlan(@RequestParam("workoutPlan") String jsonWorkoutPlan,
-                                      @RequestParam("imageFile") MultipartFile imageFile) throws IOException {
+                                      @RequestParam("imageFile") MultipartFile imageFile,
+                                      Authentication authentication) throws IOException {
         Gson gson = new Gson();
         WorkoutPlan workoutPlan = gson.fromJson(jsonWorkoutPlan, WorkoutPlan.class);
 
@@ -107,6 +144,7 @@ public class WorkoutPlanController {
                 });
         Image image = this.imageService.upload(imageFile);
         workoutPlan.setImage(image);
+        workoutPlan.setUsername((String) authentication.getPrincipal());
         workoutPlan.setSubmissionTime(LocalDateTime.now());
         workoutPlan = this.workoutPlanService.save(workoutPlan);
 
@@ -114,12 +152,16 @@ public class WorkoutPlanController {
     }
 
     @PostMapping("/{id}/add-to-favorites")
-    public WorkoutPlan addToFavorites(@PathVariable Long id) {
+    public UserDto addToFavorites(@PathVariable Long id, Authentication authentication) {
         try {
             WorkoutPlan workoutPlan = this.workoutPlanService.findById(id);
             // TODO: Find the user that is currently logged in.
+            String userEmail = (String) authentication.getPrincipal();
+            User user = this.userService.findByEmail(userEmail);
 
-            return workoutPlan;
+            user.getFavoriteWorkoutPlans().add(workoutPlan);
+
+            return new UserDto(this.userService.edit(user));
         } catch (WorkoutPlanNotFoundException e) {
             System.out.println(e.getMessage());
 
@@ -128,12 +170,16 @@ public class WorkoutPlanController {
     }
 
     @PostMapping("/{id}/remove-from-favorites")
-    public WorkoutPlan removeFromFavorites(@PathVariable Long id) {
+    public UserDto removeFromFavorites(@PathVariable Long id, Authentication authentication) {
         try {
             WorkoutPlan workoutPlan = this.workoutPlanService.findById(id);
             // TODO: Find the user that is currently logged in.
+            String userEmail = (String) authentication.getPrincipal();
+            User user = this.userService.findByEmail(userEmail);
 
-            return workoutPlan;
+            user.getFavoriteWorkoutPlans().remove(workoutPlan);
+
+            return new UserDto(this.userService.edit(user));
         } catch (WorkoutPlanNotFoundException e) {
             System.out.println(e.getMessage());
 

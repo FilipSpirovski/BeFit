@@ -38,6 +38,9 @@ public class User {
     @ManyToMany
     private List<Meal> favoriteMeals;
 
+    @OneToMany
+    private List<Rating> likedComments;
+
     public User(String email, String password) {
         this.email = email;
         this.password = password;

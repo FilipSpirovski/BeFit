@@ -11,8 +11,4 @@ import java.util.List;
 @Repository
 public interface ArticleRepository extends JpaRepository<Article, Long> {
     Page<Article> findAll(Pageable pageable);
-
-    Page<Article> findAllByTitleLike(String text, Pageable pageable);
-
-    List<Article> findAllByTitleLike(String text);
 }

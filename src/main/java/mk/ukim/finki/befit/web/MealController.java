@@ -1,17 +1,26 @@
 package mk.ukim.finki.befit.web;
 
 import com.google.gson.Gson;
+import com.querydsl.core.types.Predicate;
 import mk.ukim.finki.befit.model.Image;
 import mk.ukim.finki.befit.model.Meal;
+import mk.ukim.finki.befit.model.User;
+import mk.ukim.finki.befit.model.WorkoutPlan;
+import mk.ukim.finki.befit.model.dto.UserDto;
 import mk.ukim.finki.befit.model.enumeration.DietaryType;
 import mk.ukim.finki.befit.model.enumeration.MealType;
 import mk.ukim.finki.befit.model.exception.MealNotFoundException;
 import mk.ukim.finki.befit.repository.MealRepository;
 import mk.ukim.finki.befit.service.ImageService;
 import mk.ukim.finki.befit.service.MealService;
+import mk.ukim.finki.befit.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.querydsl.binding.QuerydslPredicate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,22 +39,55 @@ public class MealController {
     private final MealRepository mealRepository;
     private final MealService mealService;
     private final ImageService imageService;
+    private final UserService userService;
 
-    public MealController(MealRepository mealRepository, MealService mealService, ImageService imageService) {
+    public MealController(MealRepository mealRepository, MealService mealService,
+                          ImageService imageService, UserService userService) {
         this.mealRepository = mealRepository;
         this.mealService = mealService;
         this.imageService = imageService;
+        this.userService = userService;
     }
 
-    @GetMapping("/all")
+    @GetMapping("/all/{criteria}")
     public Map<String, Object> getMeals(@RequestParam(defaultValue = "0") int page,
-                                        @RequestParam(defaultValue = "3") int size) {
-        Pageable paging = PageRequest.of(page, size);
+                                        @RequestParam(defaultValue = "3") int size,
+                                        @PathVariable String criteria,
+                                        @QuerydslPredicate(root = Meal.class) Predicate predicate) {
+        Pageable paging;
+        switch (criteria) {
+            case "AlphabeticalAsc":
+                paging = PageRequest.of(page, size, Sort.by("title").ascending());
+                break;
+            case "AlphabeticalDesc":
+                paging = PageRequest.of(page, size, Sort.by("title").descending());
+                break;
+            case "PriceAsc":
+                paging = PageRequest.of(page, size, Sort.by("price").ascending());
+                break;
+            case "PriceDesc":
+                paging = PageRequest.of(page, size, Sort.by("price").descending());
+                break;
+            case "DateAsc":
+                paging = PageRequest.of(page, size, Sort.by("submissionTime").ascending());
+                break;
+            case "DateDesc":
+                paging = PageRequest.of(page, size, Sort.by("submissionTime").descending());
+                break;
+            case "RateAsc":
+                paging = PageRequest.of(page, size, Sort.by("rating").ascending());
+                break;
+            case "RateDesc":
+                paging = PageRequest.of(page, size, Sort.by("rating").descending());
+                break;
+            default:
+                paging = PageRequest.of(page, size);
+        }
         Page<Meal> mealPage;
         List<Meal> meals;
         Map<String, Object> response = new HashMap<>();
 
-        mealPage = this.mealRepository.findAll(paging);
+        mealPage = this.mealRepository.findAll(predicate, paging);
         meals = mealPage.getContent();
         response.put("meals", meals);
         response.put("currentPage", mealPage.getNumber());
@@ -92,12 +134,15 @@ public class MealController {
 
     @PostMapping("/add")
     public Meal addMeal(@RequestParam("meal") String jsonMeal,
-                        @RequestParam("imageFile") MultipartFile imageFile) throws IOException {
+                        @RequestParam("imageFile") MultipartFile imageFile,
+                        Authentication authentication) throws IOException {
         Gson gson = new Gson();
-        Meal meal = gson.fromJson(jsonMeal, Meal.class);
 
+        Meal meal = gson.fromJson(jsonMeal, Meal.class);
+        Authentication test = SecurityContextHolder.getContext().getAuthentication();
         Image image = this.imageService.upload(imageFile);
         meal.setImage(image);
+        meal.setEmail((String) authentication.getPrincipal());
         meal.setSubmissionTime(LocalDateTime.now());
         meal = this.mealService.save(meal);
 
@@ -116,12 +161,16 @@ public class MealController {
     }
 
     @PostMapping("/{id}/add-to-favorites")
-    public Meal addToFavorites(@PathVariable Long id) {
+    public UserDto addToFavorites(@PathVariable Long id, Authentication authentication) {
         try {
             Meal meal = this.mealService.findById(id);
             // TODO: Find the user that is currently logged in.
+            String userEmail = (String) authentication.getPrincipal();
+            User user = this.userService.findByEmail(userEmail);
 
-            return meal;
+            user.getFavoriteMeals().add(meal);
+
+            return new UserDto(this.userService.edit(user));
         } catch (MealNotFoundException e) {
             System.out.println(e.getMessage());
 
@@ -130,12 +179,16 @@ public class MealController {
     }
 
     @PostMapping("/{id}/remove-from-favorites")
-    public Meal removeFromFavorites(@PathVariable Long id) {
+    public UserDto removeFromFavorites(@PathVariable Long id, Authentication authentication) {
         try {
             Meal meal = this.mealService.findById(id);
             // TODO: Find the user that is currently logged in.
+            String userEmail = (String) authentication.getPrincipal();
+            User user = this.userService.findByEmail(userEmail);
 
-            return meal;
+            user.getFavoriteMeals().remove(meal);
+
+            return new UserDto(this.userService.edit(user));
         } catch (MealNotFoundException e) {
             System.out.println(e.getMessage());
 
