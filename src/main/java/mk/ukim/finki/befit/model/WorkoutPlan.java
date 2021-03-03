@@ -21,7 +21,10 @@ public class WorkoutPlan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username;
+    private String creator;
+
+    @ElementCollection()
+    private List<String> favoriteForUsers;
 
     @Column(length = 1000)
     private String title;
@@ -33,8 +36,6 @@ public class WorkoutPlan {
     private Image image;
 
     private LocalDateTime submissionTime;
-
-//    private Double price;
 
     @Enumerated(value = EnumType.STRING)
     private WorkoutType workoutType;
@@ -54,26 +55,13 @@ public class WorkoutPlan {
     @OneToMany(cascade = {CascadeType.ALL})
     private List<Review> reviews;
 
-    public WorkoutPlan(String username, String title, String description, Image image,
-                       WorkoutType workoutType, Boolean equipment, BodyPart bodyPart) {
-        this.username = username;
-        this.title = title;
-        this.image = image;
-        this.description = description;
-        this.submissionTime = LocalDateTime.now();
-        this.workoutType = workoutType;
-        this.equipment = equipment;
-        this.bodyPart = bodyPart;
-        this.muscleGroups = new ArrayList<>();
-        this.exercises = new ArrayList<>();
-        this.reviews = new ArrayList<>();
-    }
+    private Double price = 0.0;
 
-    public Integer getRating() {
+    public Double getRating() {
         if (reviews == null || reviews.isEmpty()) {
-            return 0;
+            return 0.0;
         } else {
-            return (int) reviews.stream()
+            return reviews.stream()
                     .mapToInt(Review::getScore)
                     .average().getAsDouble();
         }

@@ -1,6 +1,8 @@
 package mk.ukim.finki.befit.repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.Expressions;
 import mk.ukim.finki.befit.model.Meal;
 import mk.ukim.finki.befit.model.QMeal;
 import mk.ukim.finki.befit.model.enumeration.DietaryType;
@@ -24,8 +26,24 @@ public interface MealRepository extends JpaRepository<Meal, Long>,
 
     List<Meal> findAllByDietaryType(DietaryType dietaryType);
 
+    Page<Meal> findAllByCreator(String email, Pageable pageable);
+
+    Page<Meal> findAllByCreatorAndTitleLike(String email, String title, Pageable pageable);
+
+    Page<Meal> findAllByFavoriteForUsersContaining(String email, Pageable pageable);
+
+    Page<Meal> findAllByFavoriteForUsersContainingAndTitleLike(String email, String text, Pageable pageable);
+
     @Override
     default void customize(QuerydslBindings bindings, QMeal meal) {
+        bindings.bind(meal.title).first((path, value) -> {
+            if (!value.isEmpty()) {
+                return path.toLowerCase().contains(value.toLowerCase());
+            } else {
+                return Expressions.asBoolean(true).isFalse();
+            }
+        });
+
         bindings.bind(meal.mealTypes).all((path, value) -> {
             List<MealType> mealTypesList = new ArrayList<>();
             for (List<MealType> list : value) {
@@ -53,5 +71,7 @@ public interface MealRepository extends JpaRepository<Meal, Long>,
         });
 
         bindings.bind(meal.servings).first((path, value) -> path.eq(value));
+
+        bindings.bind(meal.favoriteForUsers).first((path, value) -> path.contains(value.get(0)));
     }
 }

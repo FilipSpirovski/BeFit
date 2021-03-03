@@ -5,11 +5,11 @@ import com.querydsl.core.types.Predicate;
 import mk.ukim.finki.befit.model.Image;
 import mk.ukim.finki.befit.model.Meal;
 import mk.ukim.finki.befit.model.User;
-import mk.ukim.finki.befit.model.WorkoutPlan;
 import mk.ukim.finki.befit.model.dto.UserDto;
 import mk.ukim.finki.befit.model.enumeration.DietaryType;
 import mk.ukim.finki.befit.model.enumeration.MealType;
 import mk.ukim.finki.befit.model.exception.MealNotFoundException;
+import mk.ukim.finki.befit.repository.ImageRepository;
 import mk.ukim.finki.befit.repository.MealRepository;
 import mk.ukim.finki.befit.service.ImageService;
 import mk.ukim.finki.befit.service.MealService;
@@ -39,13 +39,16 @@ public class MealController {
     private final MealRepository mealRepository;
     private final MealService mealService;
     private final ImageService imageService;
+    private final ImageRepository imageRepository;
     private final UserService userService;
 
     public MealController(MealRepository mealRepository, MealService mealService,
-                          ImageService imageService, UserService userService) {
+                          ImageService imageService, ImageRepository imageRepository,
+                          UserService userService) {
         this.mealRepository = mealRepository;
         this.mealService = mealService;
         this.imageService = imageService;
+        this.imageRepository = imageRepository;
         this.userService = userService;
     }
 
@@ -73,12 +76,6 @@ public class MealController {
                 break;
             case "DateDesc":
                 paging = PageRequest.of(page, size, Sort.by("submissionTime").descending());
-                break;
-            case "RateAsc":
-                paging = PageRequest.of(page, size, Sort.by("rating").ascending());
-                break;
-            case "RateDesc":
-                paging = PageRequest.of(page, size, Sort.by("rating").descending());
                 break;
             default:
                 paging = PageRequest.of(page, size);
@@ -142,7 +139,7 @@ public class MealController {
         Authentication test = SecurityContextHolder.getContext().getAuthentication();
         Image image = this.imageService.upload(imageFile);
         meal.setImage(image);
-        meal.setEmail((String) authentication.getPrincipal());
+        meal.setCreator((String) authentication.getPrincipal());
         meal.setSubmissionTime(LocalDateTime.now());
         meal = this.mealService.save(meal);
 
@@ -169,6 +166,7 @@ public class MealController {
             User user = this.userService.findByEmail(userEmail);
 
             user.getFavoriteMeals().add(meal);
+            meal.getFavoriteForUsers().add(userEmail);
 
             return new UserDto(this.userService.edit(user));
         } catch (MealNotFoundException e) {
@@ -187,6 +185,7 @@ public class MealController {
             User user = this.userService.findByEmail(userEmail);
 
             user.getFavoriteMeals().remove(meal);
+            meal.getFavoriteForUsers().remove(userEmail);
 
             return new UserDto(this.userService.edit(user));
         } catch (MealNotFoundException e) {
@@ -197,14 +196,28 @@ public class MealController {
     }
 
     @PostMapping("/edit")
-    public Meal editMeal(@RequestBody Meal meal) {
-        try {
-            return this.mealService.edit(meal);
-        } catch (MealNotFoundException e) {
-            System.out.println(e.getMessage());
+    public Meal editMeal(@RequestParam("meal") String jsonMeal,
+                         @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
+        Gson gson = new Gson();
 
-            return null;
+        Meal meal = gson.fromJson(jsonMeal, Meal.class);
+
+        Meal existingMeal = this.mealService.findById(meal.getId());
+        meal.setSubmissionTime(existingMeal.getSubmissionTime());
+
+        Image existingImage;
+        if (imageFile != null) {
+            existingImage = existingMeal.getImage();
+            this.imageRepository.delete(existingImage);
+
+            Image image = this.imageService.upload(imageFile);
+            meal.setImage(image);
+        } else {
+            existingImage = this.imageService.getImage(meal.getImage().getName());
+            meal.setImage(existingImage);
         }
+
+        return this.mealService.edit(meal);
     }
 
     @PostMapping("/{id}/delete")

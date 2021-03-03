@@ -49,11 +49,13 @@ public class MealServiceImpl implements MealService {
         Meal existingMeal = this.findById(meal.getId());
 
         existingMeal.setTitle(meal.getTitle());
+        existingMeal.setImage(meal.getImage());
         existingMeal.setMealTypes(meal.getMealTypes());
         existingMeal.setDietaryType(meal.getDietaryType());
         existingMeal.setPreparationTime(meal.getPreparationTime());
         existingMeal.setCookingTime(meal.getCookingTime());
         existingMeal.setServings(meal.getServings());
+        existingMeal.setPrice(meal.getPrice());
         existingMeal.setDescription(meal.getDescription());
         existingMeal.setIngredients(meal.getIngredients());
         existingMeal.setPreparation(meal.getPreparation());

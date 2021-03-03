@@ -39,13 +39,15 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
     public WorkoutPlan edit(WorkoutPlan workoutPlan) {
         WorkoutPlan existingWorkoutPlan = this.findById(workoutPlan.getId());
 
+        existingWorkoutPlan.setTitle(workoutPlan.getTitle());
         existingWorkoutPlan.setDescription(workoutPlan.getDescription());
+        existingWorkoutPlan.setImage(workoutPlan.getImage());
+        existingWorkoutPlan.setSubmissionTime(workoutPlan.getSubmissionTime());
         existingWorkoutPlan.setWorkoutType(workoutPlan.getWorkoutType());
         existingWorkoutPlan.setEquipment((workoutPlan.getEquipment()));
         existingWorkoutPlan.setBodyPart(workoutPlan.getBodyPart());
         existingWorkoutPlan.setMuscleGroups(workoutPlan.getMuscleGroups());
         existingWorkoutPlan.setExercises(workoutPlan.getExercises());
-        existingWorkoutPlan.setReviews(workoutPlan.getReviews());
 
         return this.workoutPlanRepository.save(existingWorkoutPlan);
     }

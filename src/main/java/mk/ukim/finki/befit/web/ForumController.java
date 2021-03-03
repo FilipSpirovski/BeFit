@@ -43,10 +43,11 @@ public class ForumController {
         this.userService = userService;
     }
 
-    @GetMapping("/articles/all/{criteria}")
+    @GetMapping("/articles/all/{criteria}/{text}")
     public Map<String, Object> getArticles(@RequestParam(defaultValue = "0") int page,
                                            @RequestParam(defaultValue = "5") int size,
-                                           @PathVariable String criteria) {
+                                           @PathVariable String criteria,
+                                           @PathVariable String text) {
         Pageable paging;
         switch (criteria) {
             case "Latest":
@@ -62,7 +63,11 @@ public class ForumController {
         List<Article> articles;
         Map<String, Object> response = new HashMap<>();
 
-        articlePage = this.articleRepository.findAll(paging);
+        if (text == null || text.isEmpty()) {
+            articlePage = this.articleRepository.findAll(paging);
+        } else {
+            articlePage = this.articleRepository.findAllByTitleLike("%" + text + "%", paging);
+        }
         articles = articlePage.getContent();
         response.put("articles", articles);
         response.put("currentPage", articlePage.getNumber());

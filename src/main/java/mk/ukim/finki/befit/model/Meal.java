@@ -23,7 +23,10 @@ public class Meal {
     @Column(length = 1000)
     private String title;
 
-    private String email;
+    private String creator;
+
+    @ElementCollection()
+    private List<String> favoriteForUsers;
 
     @OneToOne(cascade = {CascadeType.ALL})
     private Image image;
@@ -43,6 +46,8 @@ public class Meal {
 
     private Integer servings;
 
+    private Double price = 0.0;
+
     @Column(length = 8000)
     private String description;
 
@@ -53,30 +58,13 @@ public class Meal {
     private String preparation;
 
     @OneToMany(cascade = {CascadeType.ALL})
-    private List<Review> reviews = new ArrayList<>();
+    private List<Review> reviews;
 
-    public Meal(String title, String email, Image image, List<MealType> mealTypes, DietaryType dietaryType,
-                Integer preparationTime, Integer cookingTime, Integer servings, String description,
-                String ingredients, String preparation) {
-        this.title = title;
-        this.email = email;
-        this.image = image;
-        this.submissionTime = LocalDateTime.now();
-        this.mealTypes = mealTypes;
-        this.dietaryType = dietaryType;
-        this.preparationTime = preparationTime;
-        this.cookingTime = cookingTime;
-        this.servings = servings;
-        this.description = description;
-        this.ingredients = ingredients;
-        this.preparation = preparation;
-    }
-
-    public Integer getRating() {
+    public Double getRating() {
         if (reviews == null || reviews.isEmpty()) {
-            return 0;
+            return 0.0;
         } else {
-            return (int) reviews.stream()
+            return reviews.stream()
                     .mapToInt(Review::getScore)
                     .average().getAsDouble();
         }

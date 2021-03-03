@@ -5,6 +5,7 @@ import com.querydsl.core.types.Predicate;
 import mk.ukim.finki.befit.model.*;
 import mk.ukim.finki.befit.model.dto.UserDto;
 import mk.ukim.finki.befit.model.exception.WorkoutPlanNotFoundException;
+import mk.ukim.finki.befit.repository.ImageRepository;
 import mk.ukim.finki.befit.repository.WorkoutPlanRepository;
 import mk.ukim.finki.befit.service.ExerciseService;
 import mk.ukim.finki.befit.service.ImageService;
@@ -34,14 +35,18 @@ public class WorkoutPlanController {
     private final WorkoutPlanRepository workoutPlanRepository;
     private final WorkoutPlanService workoutPlanService;
     private final ImageService imageService;
+    private final ImageRepository imageRepository;
     private final ExerciseService exerciseService;
     private final UserService userService;
 
-    public WorkoutPlanController(WorkoutPlanRepository workoutPlanRepository, WorkoutPlanService workoutPlanService,
-                                 ImageService imageService, ExerciseService exerciseService, UserService userService) {
+    public WorkoutPlanController(WorkoutPlanRepository workoutPlanRepository,
+                                 WorkoutPlanService workoutPlanService,
+                                 ImageService imageService, ImageRepository imageRepository,
+                                 ExerciseService exerciseService, UserService userService) {
         this.workoutPlanRepository = workoutPlanRepository;
         this.workoutPlanService = workoutPlanService;
         this.imageService = imageService;
+        this.imageRepository = imageRepository;
         this.exerciseService = exerciseService;
         this.userService = userService;
     }
@@ -70,12 +75,6 @@ public class WorkoutPlanController {
                 break;
             case "DateDesc":
                 paging = PageRequest.of(page, size, Sort.by("submissionTime").descending());
-                break;
-            case "RateAsc":
-                paging = PageRequest.of(page, size, Sort.by("rating").ascending());
-                break;
-            case "RateDesc":
-                paging = PageRequest.of(page, size, Sort.by("rating").descending());
                 break;
             default:
                 paging = PageRequest.of(page, size);
@@ -144,7 +143,7 @@ public class WorkoutPlanController {
                 });
         Image image = this.imageService.upload(imageFile);
         workoutPlan.setImage(image);
-        workoutPlan.setUsername((String) authentication.getPrincipal());
+        workoutPlan.setCreator((String) authentication.getPrincipal());
         workoutPlan.setSubmissionTime(LocalDateTime.now());
         workoutPlan = this.workoutPlanService.save(workoutPlan);
 
@@ -160,6 +159,7 @@ public class WorkoutPlanController {
             User user = this.userService.findByEmail(userEmail);
 
             user.getFavoriteWorkoutPlans().add(workoutPlan);
+            workoutPlan.getFavoriteForUsers().add(userEmail);
 
             return new UserDto(this.userService.edit(user));
         } catch (WorkoutPlanNotFoundException e) {
@@ -178,6 +178,7 @@ public class WorkoutPlanController {
             User user = this.userService.findByEmail(userEmail);
 
             user.getFavoriteWorkoutPlans().remove(workoutPlan);
+            workoutPlan.getFavoriteForUsers().remove(userEmail);
 
             return new UserDto(this.userService.edit(user));
         } catch (WorkoutPlanNotFoundException e) {
@@ -188,14 +189,33 @@ public class WorkoutPlanController {
     }
 
     @PostMapping("/edit")
-    public WorkoutPlan editWorkoutPlan(@RequestBody WorkoutPlan workoutPlan) {
-        try {
-            return this.workoutPlanService.edit(workoutPlan);
-        } catch (WorkoutPlanNotFoundException e) {
-            System.out.println(e.getMessage());
+    public WorkoutPlan editWorkoutPlan(@RequestParam("workoutPlan") String jsonWorkoutPlan,
+                                       @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
+        Gson gson = new Gson();
+        WorkoutPlan workoutPlan = gson.fromJson(jsonWorkoutPlan, WorkoutPlan.class);
 
-            return null;
+        WorkoutPlan existingWorkoutPlan = this.workoutPlanService.findById(workoutPlan.getId());
+        workoutPlan.setSubmissionTime(existingWorkoutPlan.getSubmissionTime());
+
+        workoutPlan.getExercises()
+                .forEach(exerciseWrapper -> {
+                    Exercise exercise = this.exerciseService.findById(exerciseWrapper.getExerciseId());
+                    exerciseWrapper.setExercise(exercise);
+                });
+
+        Image existingImage;
+        if (imageFile != null) {
+            existingImage = existingWorkoutPlan.getImage();
+            this.imageRepository.delete(existingImage);
+
+            Image image = this.imageService.upload(imageFile);
+            workoutPlan.setImage(image);
+        } else {
+            existingImage = this.imageService.getImage(workoutPlan.getImage().getName());
+            workoutPlan.setImage(existingImage);
         }
+
+        return this.workoutPlanService.edit(workoutPlan);
     }
 
     @PostMapping("/{id}/delete")
