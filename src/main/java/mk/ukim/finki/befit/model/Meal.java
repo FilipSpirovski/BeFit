@@ -1,11 +1,13 @@
 package mk.ukim.finki.befit.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import mk.ukim.finki.befit.model.enumeration.DietaryType;
 import mk.ukim.finki.befit.model.enumeration.MealType;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

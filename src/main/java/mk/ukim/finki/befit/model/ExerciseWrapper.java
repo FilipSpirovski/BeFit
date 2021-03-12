@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 
 @Data
@@ -19,7 +20,7 @@ public class ExerciseWrapper {
     @Column(name = "temporary_dto_id")
     private Long exerciseId;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne()
     private Exercise exercise;
 
     private Integer numberOfSets;

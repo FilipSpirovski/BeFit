@@ -1,5 +1,6 @@
 package mk.ukim.finki.befit.web;
 
+import com.querydsl.core.types.Predicate;
 import mk.ukim.finki.befit.model.Article;
 import mk.ukim.finki.befit.model.Comment;
 import mk.ukim.finki.befit.model.Rating;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,11 +45,11 @@ public class ForumController {
         this.userService = userService;
     }
 
-    @GetMapping("/articles/all/{criteria}/{text}")
+    @GetMapping("/articles/all/{criteria}")
     public Map<String, Object> getArticles(@RequestParam(defaultValue = "0") int page,
                                            @RequestParam(defaultValue = "5") int size,
                                            @PathVariable String criteria,
-                                           @PathVariable String text) {
+                                           @QuerydslPredicate(root = Article.class) Predicate predicate) {
         Pageable paging;
         switch (criteria) {
             case "Latest":
@@ -59,20 +61,16 @@ public class ForumController {
             default:
                 paging = PageRequest.of(page, size);
         }
-        Page<Article> articlePage;
+        Page<Article> articlesPage;
         List<Article> articles;
         Map<String, Object> response = new HashMap<>();
 
-        if (text == null || text.isEmpty()) {
-            articlePage = this.articleRepository.findAll(paging);
-        } else {
-            articlePage = this.articleRepository.findAllByTitleLike("%" + text + "%", paging);
-        }
-        articles = articlePage.getContent();
+        articlesPage = this.articleRepository.findAll(predicate, paging);
+        articles = articlesPage.getContent();
         response.put("articles", articles);
-        response.put("currentPage", articlePage.getNumber());
-        response.put("totalItems", articlePage.getTotalElements());
-        response.put("totalPages", articlePage.getTotalPages());
+        response.put("currentPage", articlesPage.getNumber());
+        response.put("totalItems", articlesPage.getTotalElements());
+        response.put("totalPages", articlesPage.getTotalPages());
 
         return response;
     }
@@ -166,10 +164,15 @@ public class ForumController {
         }
     }
 
-    @PostMapping("/comments/{id}/delete")
-    public Comment deleteComment(@PathVariable Long id) {
+    @PostMapping("{articleId}/comments/{id}/delete")
+    public Article deleteComment(@PathVariable Long articleId, @PathVariable Long id) {
         try {
-            return this.commentService.delete(id);
+            Article article = this.articleService.findById(articleId);
+            Comment comment = this.commentService.findById(id);
+
+            article.getComments().remove(comment);
+
+            return this.articleService.edit(article);
         } catch (ArticleNotFoundException e) {
             System.out.println(e.getMessage());
 

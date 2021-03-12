@@ -24,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -221,6 +222,7 @@ public class MealController {
     }
 
     @PostMapping("/{id}/delete")
+    @Transactional
     public Meal deleteMeal(@PathVariable Long id) {
         try {
             return this.mealService.delete(id);

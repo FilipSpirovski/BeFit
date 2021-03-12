@@ -6,6 +6,7 @@ import mk.ukim.finki.befit.model.enumeration.MuscleGroup;
 import mk.ukim.finki.befit.model.enumeration.WorkoutType;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Data
 @NoArgsConstructor

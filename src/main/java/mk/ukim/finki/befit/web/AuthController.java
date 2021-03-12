@@ -14,6 +14,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("/auth")
 @CrossOrigin("http://localhost:4200")
@@ -85,6 +88,19 @@ public class AuthController {
                 response.setToken(jwt);
             }
         }
+
+        return response;
+    }
+
+    @PostMapping("/logout")
+    public ResponseDto logout(HttpServletRequest request) throws ServletException {
+        ResponseDto response = new ResponseDto();
+
+        request.logout();
+
+        response.setStatusCode(200);
+        response.setMessage("Successful logging out!");
+        response.setUser(null);
 
         return response;
     }

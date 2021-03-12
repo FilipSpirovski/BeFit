@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import mk.ukim.finki.befit.model.enumeration.UserRole;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 
 @Data
