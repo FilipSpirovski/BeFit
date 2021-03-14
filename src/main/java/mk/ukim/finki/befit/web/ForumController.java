@@ -35,8 +35,10 @@ public class ForumController {
     private final RatingRepository ratingRepository;
     private final UserService userService;
 
-    public ForumController(ArticleRepository articleRepository, ArticleService articleService,
-                           CommentService commentService, RatingRepository ratingRepository,
+    public ForumController(ArticleRepository articleRepository,
+                           ArticleService articleService,
+                           CommentService commentService,
+                           RatingRepository ratingRepository,
                            UserService userService) {
         this.articleRepository = articleRepository;
         this.articleService = articleService;
@@ -61,12 +63,14 @@ public class ForumController {
             default:
                 paging = PageRequest.of(page, size);
         }
+
         Page<Article> articlesPage;
         List<Article> articles;
         Map<String, Object> response = new HashMap<>();
 
         articlesPage = this.articleRepository.findAll(predicate, paging);
         articles = articlesPage.getContent();
+
         response.put("articles", articles);
         response.put("currentPage", articlesPage.getNumber());
         response.put("totalItems", articlesPage.getTotalElements());
@@ -106,6 +110,7 @@ public class ForumController {
 
         article.setSubmitter(user);
         article.setViews(0);
+
         return this.articleService.save(article);
     }
 
@@ -132,7 +137,8 @@ public class ForumController {
     }
 
     @PostMapping("/articles/{id}/add-comment")
-    public Comment addCommentToArticle(@PathVariable Long id, @RequestBody Comment comment, Authentication authentication) {
+    public Comment addCommentToArticle(@PathVariable Long id, @RequestBody Comment comment,
+                                       Authentication authentication) {
         try {
             Article article = this.articleService.findById(id);
             String userEmail = (String) authentication.getPrincipal();
@@ -142,6 +148,7 @@ public class ForumController {
             comment.setSubmissionTime(LocalDateTime.now());
             comment.setRating(0);
             comment = this.commentService.save(comment);
+
             article.getComments().add(comment);
             this.articleService.edit(article);
 
@@ -181,7 +188,8 @@ public class ForumController {
     }
 
     @PostMapping("/comments/{id}/change-rating/{vote}")
-    public Comment changeRatingOfComment(@PathVariable Long id, @PathVariable String vote, Authentication authentication) {
+    public Comment changeRatingOfComment(@PathVariable Long id, @PathVariable String vote,
+                                         Authentication authentication) {
         try {
             Comment comment = this.commentService.findById(id);
             String userEmail = (String) authentication.getPrincipal();
@@ -203,10 +211,12 @@ public class ForumController {
                 this.ratingRepository.save(rating);
             } else {
                 rating = new Rating();
+
                 rating.setEmail(userEmail);
                 rating.setCommentId(comment.getId());
                 rating.setVote(vote);
                 rating = this.ratingRepository.save(rating);
+
                 user.getLikedComments().add(rating);
                 this.userService.edit(user);
             }

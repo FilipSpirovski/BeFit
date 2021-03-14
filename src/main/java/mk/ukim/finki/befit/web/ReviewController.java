@@ -21,7 +21,9 @@ public class ReviewController {
     private final WorkoutPlanService workoutPlanService;
     private final MealService mealService;
 
-    public ReviewController(ReviewService reviewService, WorkoutPlanService workoutPlanService, MealService mealService) {
+    public ReviewController(ReviewService reviewService,
+                            WorkoutPlanService workoutPlanService,
+                            MealService mealService) {
         this.reviewService = reviewService;
         this.workoutPlanService = workoutPlanService;
         this.mealService = mealService;
@@ -33,8 +35,9 @@ public class ReviewController {
             WorkoutPlan workoutPlan = this.workoutPlanService.findById(id);
 
             review.setSubmissionTime(LocalDateTime.now());
+
             workoutPlan.getReviews().add(review);
-            this.workoutPlanService.edit(workoutPlan);
+            this.workoutPlanService.edit(workoutPlan, false);
 
             return review;
         } catch (WorkoutPlanNotFoundException e) {
@@ -50,6 +53,7 @@ public class ReviewController {
             Meal meal = this.mealService.findById(id);
 
             review.setSubmissionTime(LocalDateTime.now());
+
             meal.getReviews().add(review);
             this.mealService.edit(meal);
 

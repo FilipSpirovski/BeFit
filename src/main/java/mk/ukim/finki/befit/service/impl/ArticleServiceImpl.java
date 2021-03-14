@@ -14,7 +14,8 @@ public class ArticleServiceImpl implements ArticleService {
     private final ArticleRepository articleRepository;
     private final CommentRepository commentRepository;
 
-    public ArticleServiceImpl(ArticleRepository articleRepository, CommentRepository commentRepository) {
+    public ArticleServiceImpl(ArticleRepository articleRepository,
+                              CommentRepository commentRepository) {
         this.articleRepository = articleRepository;
         this.commentRepository = commentRepository;
     }

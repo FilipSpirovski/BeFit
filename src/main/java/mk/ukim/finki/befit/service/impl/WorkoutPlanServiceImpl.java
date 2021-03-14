@@ -14,7 +14,8 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
     private final WorkoutPlanRepository workoutPlanRepository;
     private final ReviewRepository reviewRepository;
 
-    public WorkoutPlanServiceImpl(WorkoutPlanRepository workoutPlanRepository, ReviewRepository reviewRepository) {
+    public WorkoutPlanServiceImpl(WorkoutPlanRepository workoutPlanRepository,
+                                  ReviewRepository reviewRepository) {
         this.workoutPlanRepository = workoutPlanRepository;
         this.reviewRepository = reviewRepository;
     }
@@ -36,12 +37,14 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
     }
 
     @Override
-    public WorkoutPlan edit(WorkoutPlan workoutPlan) {
+    public WorkoutPlan edit(WorkoutPlan workoutPlan, boolean newImage) {
         WorkoutPlan existingWorkoutPlan = this.findById(workoutPlan.getId());
 
         existingWorkoutPlan.setTitle(workoutPlan.getTitle());
         existingWorkoutPlan.setDescription(workoutPlan.getDescription());
-        existingWorkoutPlan.setImage(workoutPlan.getImage());
+        if (newImage) {
+            existingWorkoutPlan.setImage(workoutPlan.getImage());
+        }
         existingWorkoutPlan.setSubmissionTime(workoutPlan.getSubmissionTime());
         existingWorkoutPlan.setWorkoutType(workoutPlan.getWorkoutType());
         existingWorkoutPlan.setEquipment((workoutPlan.getEquipment()));

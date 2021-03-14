@@ -25,7 +25,9 @@ public class UserController {
     private final MealRepository mealRepository;
     private final WorkoutPlanRepository workoutPlanRepository;
 
-    public UserController(UserService userService, MealRepository mealRepository, WorkoutPlanRepository workoutPlanRepository) {
+    public UserController(UserService userService,
+                          MealRepository mealRepository,
+                          WorkoutPlanRepository workoutPlanRepository) {
         this.userService = userService;
         this.mealRepository = mealRepository;
         this.workoutPlanRepository = workoutPlanRepository;
@@ -39,8 +41,7 @@ public class UserController {
     @GetMapping("/{email}/meals")
     public Map<String, Object> getMealsCreatedByUser(@RequestParam(defaultValue = "0") int page,
                                                      @RequestParam(defaultValue = "3") int size,
-                                                     @PathVariable String email,
-                                                     @RequestParam String text) {
+                                                     @PathVariable String email, @RequestParam String text) {
         Page<Meal> mealsPage;
         List<Meal> meals;
         Map<String, Object> response = new HashMap<>();
@@ -53,6 +54,7 @@ public class UserController {
             mealsPage = this.mealRepository.findAllByCreatorAndTitleLike(email, "%" + text + "%", paging);
         }
         meals = mealsPage.getContent();
+
         response.put("meals", meals);
         response.put("currentPage", mealsPage.getNumber());
         response.put("totalItems", mealsPage.getTotalElements());
@@ -64,8 +66,7 @@ public class UserController {
     @GetMapping("/{email}/workout-plans")
     public Map<String, Object> getWorkoutPlansCreatedByUser(@RequestParam(defaultValue = "0") int page,
                                                             @RequestParam(defaultValue = "3") int size,
-                                                            @PathVariable String email,
-                                                            @RequestParam String text) {
+                                                            @PathVariable String email, @RequestParam String text) {
         Page<WorkoutPlan> workoutPlansPage;
         List<WorkoutPlan> workoutPlans;
         Map<String, Object> response = new HashMap<>();
@@ -78,6 +79,7 @@ public class UserController {
             workoutPlansPage = this.workoutPlanRepository.findAllByCreatorAndTitleLike(email, "%" + text + "%", paging);
         }
         workoutPlans = workoutPlansPage.getContent();
+
         response.put("workoutPlans", workoutPlans);
         response.put("currentPage", workoutPlansPage.getNumber());
         response.put("totalItems", workoutPlansPage.getTotalElements());
@@ -98,6 +100,7 @@ public class UserController {
 
         mealsPage = this.mealRepository.findAll(predicate, paging);
         meals = mealsPage.getContent();
+
         response.put("meals", meals);
         response.put("currentPage", mealsPage.getNumber());
         response.put("totalItems", mealsPage.getTotalElements());
@@ -118,6 +121,7 @@ public class UserController {
 
         workoutPlansPage = this.workoutPlanRepository.findAll(predicate, paging);
         workoutPlans = workoutPlansPage.getContent();
+
         response.put("workoutPlans", workoutPlans);
         response.put("currentPage", workoutPlansPage.getNumber());
         response.put("totalItems", workoutPlansPage.getTotalElements());

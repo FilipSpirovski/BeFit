@@ -31,6 +31,12 @@ public interface ExerciseRepository extends JpaRepository<Exercise, Long>,
 
     @Override
     default void customize(QuerydslBindings bindings, QExercise exercise) {
+        bindings.bind(exercise.id).all((path, value) -> {
+            BooleanBuilder predicate = new BooleanBuilder();
+            value.forEach(id -> predicate.and(path.ne(id)));
+            return Optional.of(predicate);
+        });
+
         bindings.bind(exercise.workoutType).first((path, value) -> path.eq(value));
 
         bindings.bind(exercise.muscleGroup).all((path, value) -> {

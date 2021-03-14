@@ -17,7 +17,8 @@ public class ExerciseServiceImpl implements ExerciseService {
     private final ExerciseRepository exerciseRepository;
     private final ImageService imageService;
 
-    public ExerciseServiceImpl(ExerciseRepository exerciseRepository, ImageService imageService) {
+    public ExerciseServiceImpl(ExerciseRepository exerciseRepository,
+                               ImageService imageService) {
         this.exerciseRepository = exerciseRepository;
         this.imageService = imageService;
     }

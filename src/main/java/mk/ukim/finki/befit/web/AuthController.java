@@ -48,6 +48,7 @@ public class AuthController {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             user.setRole(UserRole.ROLE_USER);
             user = this.userService.register(user);
+
             response.setStatusCode(200);
             response.setMessage("Successful registration!");
             response.setUser(new UserDto(user));
@@ -75,11 +76,9 @@ public class AuthController {
                 response.setUser(null);
             } else {
                 Authentication authentication = authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(email, password)
-                );
+                        new UsernamePasswordAuthenticationToken(email, password));
                 SecurityContextHolder.getContext()
                         .setAuthentication(authentication);
-
                 String jwt = jwtProvider.generateToken(authentication);
 
                 response.setStatusCode(200);
@@ -107,7 +106,7 @@ public class AuthController {
 
     @GetMapping("/current-user")
     public UserDto getCurrentUser(Authentication authentication) {
-        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (authentication == null) {
             return null;
         }
 

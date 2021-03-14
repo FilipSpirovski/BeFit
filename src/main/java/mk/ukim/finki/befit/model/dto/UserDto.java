@@ -43,6 +43,7 @@ public class UserDto {
         this.surname = user.getSurname();
         this.role = user.getRole();
         this.profilePictureUrl = user.getProfilePictureUrl();
+        this.likedComments = user.getLikedComments();
 
         if (user.getFavoriteWorkoutPlans() != null) {
             this.favoriteWorkoutPlans = user.getFavoriteWorkoutPlans()
@@ -57,7 +58,5 @@ public class UserDto {
                     .map(Meal::getId)
                     .collect(Collectors.toList());
         }
-        
-        this.likedComments = user.getLikedComments();
     }
 }

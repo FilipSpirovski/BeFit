@@ -5,6 +5,7 @@ import mk.ukim.finki.befit.model.User;
 import java.util.List;
 
 public interface UserService {
+
     Integer getNumberOfUsers();
 
     User findByEmail(String email);

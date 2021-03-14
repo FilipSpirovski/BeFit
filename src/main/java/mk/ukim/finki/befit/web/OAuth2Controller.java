@@ -43,8 +43,10 @@ public class OAuth2Controller {
     private final JwtProvider jwtProvider;
     private final UserService userService;
 
-    public OAuth2Controller(PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager,
-                            JwtProvider jwtProvider, UserService userService) {
+    public OAuth2Controller(PasswordEncoder passwordEncoder,
+                            AuthenticationManager authenticationManager,
+                            JwtProvider jwtProvider,
+                            UserService userService) {
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtProvider = jwtProvider;
@@ -73,8 +75,7 @@ public class OAuth2Controller {
         Facebook facebook = new FacebookTemplate(tokenDto.getValue());
         final String[] fields = {"email", "first_name", "last_name", "picture"};
         org.springframework.social.facebook.api.User facebookUser = facebook.fetchObject(
-                "me", org.springframework.social.facebook.api.User.class, fields
-        );
+                "me", org.springframework.social.facebook.api.User.class, fields);
 
         User user = getFacebookUser(facebookUser);
         TokenDto tokenResponse = login(user);
@@ -100,12 +101,9 @@ public class OAuth2Controller {
 
     private TokenDto login(User user) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getEmail(), secretPsw)
-        );
-
+                new UsernamePasswordAuthenticationToken(user.getEmail(), secretPsw));
         SecurityContextHolder.getContext()
                 .setAuthentication(authentication);
-
         String jwt = jwtProvider.generateToken(authentication);
 
         TokenDto tokenDto = new TokenDto();

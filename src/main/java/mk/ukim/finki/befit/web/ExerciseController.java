@@ -5,7 +5,6 @@ import com.querydsl.core.types.Predicate;
 import mk.ukim.finki.befit.model.Exercise;
 import mk.ukim.finki.befit.model.Image;
 import mk.ukim.finki.befit.model.enumeration.MuscleGroup;
-import mk.ukim.finki.befit.model.enumeration.WorkoutType;
 import mk.ukim.finki.befit.model.exception.ExerciseNotFoundException;
 import mk.ukim.finki.befit.repository.ExerciseRepository;
 import mk.ukim.finki.befit.service.ExerciseService;
@@ -21,7 +20,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/exercises")
@@ -31,7 +29,9 @@ public class ExerciseController {
     private final ExerciseService exerciseService;
     private final ImageService imageService;
 
-    public ExerciseController(ExerciseRepository exerciseRepository, ExerciseService exerciseService, ImageService imageService) {
+    public ExerciseController(ExerciseRepository exerciseRepository,
+                              ExerciseService exerciseService,
+                              ImageService imageService) {
         this.exerciseRepository = exerciseRepository;
         this.exerciseService = exerciseService;
         this.imageService = imageService;
@@ -54,6 +54,7 @@ public class ExerciseController {
         Pageable paging = PageRequest.of(page, size);
         exercisePage = this.exerciseRepository.findAll(predicate, paging);
         exercises = exercisePage.getContent();
+
         response.put("exercises", exercises);
         response.put("currentPage", exercisePage.getNumber());
         response.put("totalItems", exercisePage.getTotalElements());
@@ -76,9 +77,10 @@ public class ExerciseController {
     public Exercise addExercise(@RequestParam("exercise") String jsonExercise,
                                 @RequestParam("imageFile") MultipartFile imageFile) throws IOException {
         Gson gson = new Gson();
-        Exercise exercise = gson.fromJson(jsonExercise, Exercise.class);
 
+        Exercise exercise = gson.fromJson(jsonExercise, Exercise.class);
         Image image = this.imageService.upload(imageFile);
+
         exercise.setImage(image);
         exercise = this.exerciseService.save(exercise);
 

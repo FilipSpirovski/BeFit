@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 public interface ImageService {
+
     Image findByName(String name);
 
     Image getImage(String name) throws IOException;

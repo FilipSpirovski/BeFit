@@ -79,12 +79,14 @@ public class WorkoutPlanController {
             default:
                 paging = PageRequest.of(page, size);
         }
+
         Page<WorkoutPlan> workoutPlanPage;
         List<WorkoutPlan> workoutPlans;
         Map<String, Object> response = new HashMap<>();
 
         workoutPlanPage = this.workoutPlanRepository.findAll(predicate, paging);
         workoutPlans = workoutPlanPage.getContent();
+
         response.put("workoutPlans", workoutPlans);
         response.put("currentPage", workoutPlanPage.getNumber());
         response.put("totalItems", workoutPlanPage.getTotalElements());
@@ -134,14 +136,15 @@ public class WorkoutPlanController {
                                       @RequestParam("imageFile") MultipartFile imageFile,
                                       Authentication authentication) throws IOException {
         Gson gson = new Gson();
+
         WorkoutPlan workoutPlan = gson.fromJson(jsonWorkoutPlan, WorkoutPlan.class);
+        Image image = this.imageService.upload(imageFile);
 
         workoutPlan.getExercises()
                 .forEach(exerciseWrapper -> {
                     Exercise exercise = this.exerciseService.findById(exerciseWrapper.getExerciseId());
                     exerciseWrapper.setExercise(exercise);
                 });
-        Image image = this.imageService.upload(imageFile);
         workoutPlan.setImage(image);
         workoutPlan.setCreator((String) authentication.getPrincipal());
         workoutPlan.setSubmissionTime(LocalDateTime.now());
@@ -178,9 +181,11 @@ public class WorkoutPlanController {
             User user = this.userService.findByEmail(userEmail);
 
             user.getFavoriteWorkoutPlans().remove(workoutPlan);
+            user = this.userService.edit(user);
+
             workoutPlan.getFavoriteForUsers().remove(userEmail);
 
-            return new UserDto(this.userService.edit(user));
+            return new UserDto(user);
         } catch (WorkoutPlanNotFoundException e) {
             System.out.println(e.getMessage());
 
@@ -192,30 +197,29 @@ public class WorkoutPlanController {
     public WorkoutPlan editWorkoutPlan(@RequestParam("workoutPlan") String jsonWorkoutPlan,
                                        @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
         Gson gson = new Gson();
+
         WorkoutPlan workoutPlan = gson.fromJson(jsonWorkoutPlan, WorkoutPlan.class);
-
         WorkoutPlan existingWorkoutPlan = this.workoutPlanService.findById(workoutPlan.getId());
-        workoutPlan.setSubmissionTime(existingWorkoutPlan.getSubmissionTime());
+        Image existingImage;
 
+        workoutPlan.setSubmissionTime(existingWorkoutPlan.getSubmissionTime());
         workoutPlan.getExercises()
                 .forEach(exerciseWrapper -> {
                     Exercise exercise = this.exerciseService.findById(exerciseWrapper.getExerciseId());
                     exerciseWrapper.setExercise(exercise);
                 });
 
-        Image existingImage;
         if (imageFile != null) {
             existingImage = existingWorkoutPlan.getImage();
-            this.imageRepository.delete(existingImage);
+            this.imageRepository.deleteById(existingImage.getId());
 
             Image image = this.imageService.upload(imageFile);
             workoutPlan.setImage(image);
-        } else {
-            existingImage = this.imageService.getImage(workoutPlan.getImage().getName());
-            workoutPlan.setImage(existingImage);
-        }
 
-        return this.workoutPlanService.edit(workoutPlan);
+            return this.workoutPlanService.edit(workoutPlan, true);
+        } else {
+            return this.workoutPlanService.edit(workoutPlan, false);
+        }
     }
 
     @PostMapping("/{id}/delete")

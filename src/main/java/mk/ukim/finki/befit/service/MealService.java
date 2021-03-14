@@ -7,6 +7,7 @@ import mk.ukim.finki.befit.model.enumeration.MealType;
 import java.util.List;
 
 public interface MealService {
+
     List<Meal> findAll();
 
     List<Meal> findAllByMealType(MealType mealType);

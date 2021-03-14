@@ -20,7 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -43,8 +42,10 @@ public class MealController {
     private final ImageRepository imageRepository;
     private final UserService userService;
 
-    public MealController(MealRepository mealRepository, MealService mealService,
-                          ImageService imageService, ImageRepository imageRepository,
+    public MealController(MealRepository mealRepository,
+                          MealService mealService,
+                          ImageService imageService,
+                          ImageRepository imageRepository,
                           UserService userService) {
         this.mealRepository = mealRepository;
         this.mealService = mealService;
@@ -81,12 +82,14 @@ public class MealController {
             default:
                 paging = PageRequest.of(page, size);
         }
+
         Page<Meal> mealPage;
         List<Meal> meals;
         Map<String, Object> response = new HashMap<>();
 
         mealPage = this.mealRepository.findAll(predicate, paging);
         meals = mealPage.getContent();
+
         response.put("meals", meals);
         response.put("currentPage", mealPage.getNumber());
         response.put("totalItems", mealPage.getTotalElements());
@@ -137,8 +140,8 @@ public class MealController {
         Gson gson = new Gson();
 
         Meal meal = gson.fromJson(jsonMeal, Meal.class);
-        Authentication test = SecurityContextHolder.getContext().getAuthentication();
         Image image = this.imageService.upload(imageFile);
+
         meal.setImage(image);
         meal.setCreator((String) authentication.getPrincipal());
         meal.setSubmissionTime(LocalDateTime.now());
@@ -167,9 +170,11 @@ public class MealController {
             User user = this.userService.findByEmail(userEmail);
 
             user.getFavoriteMeals().add(meal);
+            user = this.userService.edit(user);
+
             meal.getFavoriteForUsers().add(userEmail);
 
-            return new UserDto(this.userService.edit(user));
+            return new UserDto(user);
         } catch (MealNotFoundException e) {
             System.out.println(e.getMessage());
 
@@ -186,9 +191,11 @@ public class MealController {
             User user = this.userService.findByEmail(userEmail);
 
             user.getFavoriteMeals().remove(meal);
+            user = this.userService.edit(user);
+
             meal.getFavoriteForUsers().remove(userEmail);
 
-            return new UserDto(this.userService.edit(user));
+            return new UserDto(user);
         } catch (MealNotFoundException e) {
             System.out.println(e.getMessage());
 
@@ -202,11 +209,11 @@ public class MealController {
         Gson gson = new Gson();
 
         Meal meal = gson.fromJson(jsonMeal, Meal.class);
-
         Meal existingMeal = this.mealService.findById(meal.getId());
+        Image existingImage;
+
         meal.setSubmissionTime(existingMeal.getSubmissionTime());
 
-        Image existingImage;
         if (imageFile != null) {
             existingImage = existingMeal.getImage();
             this.imageRepository.delete(existingImage);
