@@ -199,10 +199,7 @@ public class WorkoutPlanController {
         Gson gson = new Gson();
 
         WorkoutPlan workoutPlan = gson.fromJson(jsonWorkoutPlan, WorkoutPlan.class);
-        WorkoutPlan existingWorkoutPlan = this.workoutPlanService.findById(workoutPlan.getId());
-        Image existingImage;
-
-        workoutPlan.setSubmissionTime(existingWorkoutPlan.getSubmissionTime());
+        
         workoutPlan.getExercises()
                 .forEach(exerciseWrapper -> {
                     Exercise exercise = this.exerciseService.findById(exerciseWrapper.getExerciseId());
@@ -210,9 +207,6 @@ public class WorkoutPlanController {
                 });
 
         if (imageFile != null) {
-            existingImage = existingWorkoutPlan.getImage();
-            this.imageRepository.deleteById(existingImage.getId());
-
             Image image = this.imageService.upload(imageFile);
             workoutPlan.setImage(image);
 

@@ -45,7 +45,6 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
         if (newImage) {
             existingWorkoutPlan.setImage(workoutPlan.getImage());
         }
-        existingWorkoutPlan.setSubmissionTime(workoutPlan.getSubmissionTime());
         existingWorkoutPlan.setWorkoutType(workoutPlan.getWorkoutType());
         existingWorkoutPlan.setEquipment((workoutPlan.getEquipment()));
         existingWorkoutPlan.setBodyPart(workoutPlan.getBodyPart());

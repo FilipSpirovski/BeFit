@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
@@ -49,7 +50,7 @@ public class ImageServiceImpl implements ImageService {
         System.out.println("Original image byte size -> " + imageFile.getBytes().length);
 
         Image image = new Image(
-                imageFile.getOriginalFilename(),
+                String.format("%s (%s)", imageFile.getOriginalFilename(), LocalDateTime.now().toString()),
                 imageFile.getContentType(),
                 imageFile.getBytes()
         );
