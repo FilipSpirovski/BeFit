@@ -1,7 +1,6 @@
 package mk.ukim.finki.befit.repository;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.Expressions;
 import mk.ukim.finki.befit.model.Meal;
 import mk.ukim.finki.befit.model.QMeal;
@@ -10,7 +9,6 @@ import mk.ukim.finki.befit.model.enumeration.MealType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
@@ -29,10 +27,6 @@ public interface MealRepository extends JpaRepository<Meal, Long>,
     Page<Meal> findAllByCreator(String email, Pageable pageable);
 
     Page<Meal> findAllByCreatorAndTitleLike(String email, String title, Pageable pageable);
-
-    Page<Meal> findAllByFavoriteForUsersContaining(String email, Pageable pageable);
-
-    Page<Meal> findAllByFavoriteForUsersContainingAndTitleLike(String email, String text, Pageable pageable);
 
     @Override
     default void customize(QuerydslBindings bindings, QMeal meal) {

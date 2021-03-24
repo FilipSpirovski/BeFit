@@ -1,7 +1,6 @@
 package mk.ukim.finki.befit.repository;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.Expressions;
 import mk.ukim.finki.befit.model.QWorkoutPlan;
 import mk.ukim.finki.befit.model.WorkoutPlan;
@@ -25,10 +24,6 @@ public interface WorkoutPlanRepository extends JpaRepository<WorkoutPlan, Long>,
     Page<WorkoutPlan> findAllByCreator(String email, Pageable pageable);
 
     Page<WorkoutPlan> findAllByCreatorAndTitleLike(String email, String text, Pageable pageable);
-
-    Page<WorkoutPlan> findAllByFavoriteForUsersContaining(String email, Pageable pageable);
-
-    Page<WorkoutPlan> findAllByFavoriteForUsersContainingAndTitleLike(String email, String text, Pageable pageable);
 
     @Override
     default void customize(QuerydslBindings bindings, QWorkoutPlan workoutPlan) {

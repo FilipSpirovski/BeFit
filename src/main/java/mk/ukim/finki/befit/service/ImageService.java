@@ -11,7 +11,7 @@ public interface ImageService {
 
     Image getImage(String name) throws IOException;
 
-    Image upload(MultipartFile imageFile) throws IOException;
+    Image getImageFromFile(MultipartFile imageFile) throws IOException;
 
     byte[] compressBytes(byte[] data);
 

@@ -3,48 +3,25 @@ package mk.ukim.finki.befit.web;
 import com.querydsl.core.types.Predicate;
 import mk.ukim.finki.befit.model.Article;
 import mk.ukim.finki.befit.model.Comment;
-import mk.ukim.finki.befit.model.Rating;
-import mk.ukim.finki.befit.model.User;
-import mk.ukim.finki.befit.model.exception.ArticleNotFoundException;
-import mk.ukim.finki.befit.model.exception.CommentNotFoundException;
-import mk.ukim.finki.befit.repository.ArticleRepository;
-import mk.ukim.finki.befit.repository.RatingRepository;
 import mk.ukim.finki.befit.service.ArticleService;
 import mk.ukim.finki.befit.service.CommentService;
-import mk.ukim.finki.befit.service.UserService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/forum")
 @CrossOrigin("http://localhost:4200")
 public class ForumController {
-    private final ArticleRepository articleRepository;
+
     private final ArticleService articleService;
     private final CommentService commentService;
-    private final RatingRepository ratingRepository;
-    private final UserService userService;
 
-    public ForumController(ArticleRepository articleRepository,
-                           ArticleService articleService,
-                           CommentService commentService,
-                           RatingRepository ratingRepository,
-                           UserService userService) {
-        this.articleRepository = articleRepository;
+    public ForumController(ArticleService articleService, CommentService commentService) {
         this.articleService = articleService;
         this.commentService = commentService;
-        this.ratingRepository = ratingRepository;
-        this.userService = userService;
     }
 
     @GetMapping("/articles/all/{criteria}")
@@ -52,180 +29,57 @@ public class ForumController {
                                            @RequestParam(defaultValue = "5") int size,
                                            @PathVariable String criteria,
                                            @QuerydslPredicate(root = Article.class) Predicate predicate) {
-        Pageable paging;
-        switch (criteria) {
-            case "Latest":
-                paging = PageRequest.of(page, size, Sort.by("submissionTime").descending());
-                break;
-            case "Most popular":
-                paging = PageRequest.of(page, size, Sort.by("views").descending());
-                break;
-            default:
-                paging = PageRequest.of(page, size);
-        }
-
-        Page<Article> articlesPage;
-        List<Article> articles;
-        Map<String, Object> response = new HashMap<>();
-
-        articlesPage = this.articleRepository.findAll(predicate, paging);
-        articles = articlesPage.getContent();
-
-        response.put("articles", articles);
-        response.put("currentPage", articlesPage.getNumber());
-        response.put("totalItems", articlesPage.getTotalElements());
-        response.put("totalPages", articlesPage.getTotalPages());
-
-        return response;
+        return this.articleService.findAllByPredicate(page, size, criteria, predicate);
     }
 
     @GetMapping("/articles/{id}")
     public Article getArticle(@PathVariable Long id) {
-        try {
-            Article article = this.articleService.findById(id);
-
-            article.click();
-            this.articleService.edit(article);
-
-            return article;
-        } catch (ArticleNotFoundException e) {
-            System.out.println(e.getMessage());
-
-            return null;
-        }
+        return this.articleService.findById(id);
     }
 
     @PostMapping("/increment-views/{id}")
-    public void incrementViewsForArticle(@PathVariable Long id, @RequestBody Object object) {
-        Article article = this.articleService.findById(id);
-
-        article.click();
-        this.articleService.edit(article);
+    public void incrementViewsForArticle(@PathVariable Long id,
+                                         @RequestBody(required = false) Object body) {
+        this.articleService.incrementViews(id);
     }
 
     @PostMapping("/articles/add")
     public Article addArticle(@RequestBody Article article, Authentication authentication) {
-        String userEmail = (String) authentication.getPrincipal();
-        User user = this.userService.findByEmail(userEmail);
-
-        article.setSubmitter(user);
-        article.setViews(0);
-
-        return this.articleService.save(article);
+        return this.articleService.save(article, authentication);
     }
 
     @PostMapping("/articles/edit")
     public Article editArticle(@RequestBody Article article) {
-        try {
-            return this.articleService.edit(article);
-        } catch (ArticleNotFoundException e) {
-            System.out.println(e.getMessage());
-
-            return null;
-        }
+        return this.articleService.edit(article);
     }
 
     @PostMapping("/articles/{id}/delete")
     public Article deleteArticle(@PathVariable Long id) {
-        try {
-            return this.articleService.delete(id);
-        } catch (ArticleNotFoundException e) {
-            System.out.println(e.getMessage());
-
-            return null;
-        }
+        return this.articleService.delete(id);
     }
 
     @PostMapping("/articles/{id}/add-comment")
-    public Comment addCommentToArticle(@PathVariable Long id, @RequestBody Comment comment,
+    public Comment addCommentToArticle(@PathVariable Long id,
+                                       @RequestBody Comment comment,
                                        Authentication authentication) {
-        try {
-            Article article = this.articleService.findById(id);
-            String userEmail = (String) authentication.getPrincipal();
-            User user = this.userService.findByEmail(userEmail);
-
-            comment.setSubmitter(user);
-            comment.setSubmissionTime(LocalDateTime.now());
-            comment.setRating(0);
-            comment = this.commentService.save(comment);
-
-            article.getComments().add(comment);
-            this.articleService.edit(article);
-
-            return comment;
-        } catch (ArticleNotFoundException e) {
-            System.out.println(e.getMessage());
-
-            return null;
-        }
+        return this.articleService.addComment(id, comment, authentication);
     }
 
     @PostMapping("/comments/edit")
     public Comment editComment(@RequestBody Comment comment) {
-        try {
-            return this.commentService.edit(comment);
-        } catch (ArticleNotFoundException e) {
-            System.out.println(e.getMessage());
-
-            return null;
-        }
+        return this.commentService.edit(comment);
     }
 
-    @PostMapping("{articleId}/comments/{id}/delete")
-    public Article deleteComment(@PathVariable Long articleId, @PathVariable Long id) {
-        try {
-            Article article = this.articleService.findById(articleId);
-            Comment comment = this.commentService.findById(id);
-
-            article.getComments().remove(comment);
-
-            return this.articleService.edit(article);
-        } catch (ArticleNotFoundException e) {
-            System.out.println(e.getMessage());
-
-            return null;
-        }
+    @PostMapping("{articleId}/comments/{commentId}/delete")
+    public Article deleteComment(@PathVariable Long articleId,
+                                 @PathVariable Long commentId) {
+        return this.articleService.removeComment(articleId, commentId);
     }
 
     @PostMapping("/comments/{id}/change-rating/{vote}")
-    public Comment changeRatingOfComment(@PathVariable Long id, @PathVariable String vote,
+    public Comment changeRatingOfComment(@PathVariable Long id,
+                                         @PathVariable String vote,
                                          Authentication authentication) {
-        try {
-            Comment comment = this.commentService.findById(id);
-            String userEmail = (String) authentication.getPrincipal();
-            User user = this.userService.findByEmail(userEmail);
-            Rating rating = this.ratingRepository.findByEmailAndCommentId(userEmail, id);
-
-            switch (vote) {
-                case "upVote":
-                    comment.upVote();
-                    break;
-                case "downVote":
-                    comment.downVote();
-                    break;
-            }
-            this.commentService.edit(comment);
-
-            if (rating != null) {
-                rating.setVote(vote);
-                this.ratingRepository.save(rating);
-            } else {
-                rating = new Rating();
-
-                rating.setEmail(userEmail);
-                rating.setCommentId(comment.getId());
-                rating.setVote(vote);
-                rating = this.ratingRepository.save(rating);
-
-                user.getLikedComments().add(rating);
-                this.userService.edit(user);
-            }
-
-            return comment;
-        } catch (CommentNotFoundException e) {
-            System.out.println(e.getMessage());
-
-            return null;
-        }
+        return this.commentService.changeRating(id, vote, authentication);
     }
 }

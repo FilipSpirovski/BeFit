@@ -46,7 +46,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public Image upload(MultipartFile imageFile) throws IOException {
+    public Image getImageFromFile(MultipartFile imageFile) throws IOException {
         System.out.println("Original image byte size -> " + imageFile.getBytes().length);
 
         Image image = new Image(
