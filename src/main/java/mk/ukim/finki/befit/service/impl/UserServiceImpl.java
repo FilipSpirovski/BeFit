@@ -5,10 +5,10 @@ import mk.ukim.finki.befit.model.Meal;
 import mk.ukim.finki.befit.model.WorkoutPlan;
 import mk.ukim.finki.befit.model.exception.UserNotFoundException;
 import mk.ukim.finki.befit.model.User;
+import mk.ukim.finki.befit.repository.MealRepository;
 import mk.ukim.finki.befit.repository.UserRepository;
-import mk.ukim.finki.befit.service.MealService;
+import mk.ukim.finki.befit.repository.WorkoutPlanRepository;
 import mk.ukim.finki.befit.service.UserService;
-import mk.ukim.finki.befit.service.WorkoutPlanService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,14 +22,14 @@ import java.util.Map;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final MealService mealService;
-    private final WorkoutPlanService workoutPlanService;
+    private final MealRepository mealRepository;
+    private final WorkoutPlanRepository workoutPlanRepository;
 
-    public UserServiceImpl(UserRepository userRepository, MealService mealService,
-                           WorkoutPlanService workoutPlanService) {
+    public UserServiceImpl(UserRepository userRepository, MealRepository mealRepository,
+                           WorkoutPlanRepository workoutPlanRepository) {
         this.userRepository = userRepository;
-        this.mealService = mealService;
-        this.workoutPlanService = workoutPlanService;
+        this.mealRepository = mealRepository;
+        this.workoutPlanRepository = workoutPlanRepository;
     }
 
     @Override
@@ -80,9 +80,9 @@ public class UserServiceImpl implements UserService {
         Pageable paging = PageRequest.of(page, size);
 
         if (text == null || text.isEmpty() || text.equals("none")) {
-            mealsPage = this.mealService.findAllByCreator(userEmail, paging);
+            mealsPage = this.mealRepository.findAllByCreator(userEmail, paging);
         } else {
-            mealsPage = this.mealService.findAllByCreatorAndTitle(userEmail, text, paging);
+            mealsPage = this.mealRepository.findAllByCreatorAndTitleLike(userEmail, text, paging);
         }
 
         meals = mealsPage.getContent();
@@ -103,7 +103,7 @@ public class UserServiceImpl implements UserService {
 
         Pageable paging = PageRequest.of(page, size);
 
-        mealsPage = this.mealService.findAllByPredicate(predicate, paging);
+        mealsPage = this.mealRepository.findAll(predicate, paging);
         meals = mealsPage.getContent();
 
         response.put("meals", meals);
@@ -123,9 +123,9 @@ public class UserServiceImpl implements UserService {
         Pageable paging = PageRequest.of(page, size);
 
         if (text == null || text.isEmpty()) {
-            workoutPlansPage = this.workoutPlanService.findAllByCreator(email, paging);
+            workoutPlansPage = this.workoutPlanRepository.findAllByCreator(email, paging);
         } else {
-            workoutPlansPage = this.workoutPlanService.findAllByCreatorAndTitle(email, text, paging);
+            workoutPlansPage = this.workoutPlanRepository.findAllByCreatorAndTitleLike(email, text, paging);
         }
 
         workoutPlans = workoutPlansPage.getContent();
@@ -146,7 +146,7 @@ public class UserServiceImpl implements UserService {
 
         Pageable paging = PageRequest.of(page, size);
 
-        workoutPlansPage = this.workoutPlanService.findAllByPredicate(predicate, paging);
+        workoutPlansPage = this.workoutPlanRepository.findAll(predicate, paging);
         workoutPlans = workoutPlansPage.getContent();
 
         response.put("workoutPlans", workoutPlans);

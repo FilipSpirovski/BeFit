@@ -210,7 +210,7 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
         existingWorkoutPlan.setBodyPart(workoutPlan.getBodyPart());
         existingWorkoutPlan.setMuscleGroups(workoutPlan.getMuscleGroups());
         existingWorkoutPlan.setExercises(workoutPlan.getExercises());
-        existingWorkoutPlan.setReviews(workoutPlan.getReviews());
+        //existingWorkoutPlan.setReviews(workoutPlan.getReviews());
         existingWorkoutPlan.setPrice(workoutPlan.getPrice());
 
         return this.workoutPlanRepository.save(existingWorkoutPlan);

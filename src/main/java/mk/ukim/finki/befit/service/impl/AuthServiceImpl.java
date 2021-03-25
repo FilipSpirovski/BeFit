@@ -44,7 +44,7 @@ public class AuthServiceImpl implements AuthService {
             response.setMessage(String.format("The user with the provided email (%s) already exists!", email));
             response.setUser(null);
         } else {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setPassword(this.passwordEncoder.encode(user.getPassword()));
             user.setRole(UserRole.ROLE_USER);
             user = this.userService.register(user);
 
@@ -69,16 +69,16 @@ public class AuthServiceImpl implements AuthService {
             User user = this.userService.findByEmail(email);
             String password = loginDto.getPassword();
 
-            if (!passwordEncoder.matches(password, user.getPassword())) {
+            if (!this.passwordEncoder.matches(password, user.getPassword())) {
                 response.setStatusCode(401);
                 response.setMessage("Passwords do not match!");
                 response.setUser(null);
             } else {
-                Authentication authentication = authenticationManager.authenticate(
+                Authentication authentication = this.authenticationManager.authenticate(
                         new UsernamePasswordAuthenticationToken(email, password));
                 SecurityContextHolder.getContext()
                         .setAuthentication(authentication);
-                String jwt = jwtProvider.generateToken(authentication);
+                String jwt = this.jwtProvider.generateToken(authentication);
 
                 response.setStatusCode(200);
                 response.setMessage("Successful registration!");
