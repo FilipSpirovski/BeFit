@@ -37,16 +37,6 @@ public class MealController {
         return this.mealService.getNumberOfMeals();
     }
 
-    @GetMapping("/{mealType}/all")
-    public List<Meal> getMealsByMealType(@PathVariable String mealType) {
-        return this.mealService.findAllByMealType(mealType);
-    }
-
-    @GetMapping("/{dietaryType}/all")
-    public List<Meal> getMealsByDietaryType(@PathVariable String dietaryType) {
-        return this.mealService.findAllByDietaryType(dietaryType);
-    }
-
     @GetMapping("/latest/{currentMealId}")
     public List<Meal> getLatestMeals(@PathVariable Long currentMealId) {
         return this.mealService.getLatestMeals(currentMealId);

@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -34,24 +33,9 @@ public class ExerciseController {
         return this.exerciseService.findAllByPredicate(page, size, predicate);
     }
 
-    @GetMapping("/{muscleGroup}/all")
-    public List<Exercise> getExercisesByMuscleGroup(@PathVariable String muscleGroup) {
-        return this.exerciseService.findAllByMuscleGroup(muscleGroup);
-    }
-
-    @GetMapping("/search/{text}")
-    public List<Exercise> searchExercisesByName(@PathVariable String text) {
-        return this.exerciseService.searchByName(text);
-    }
-
     @PostMapping("/add")
     public Exercise addExercise(@RequestParam("exercise") String jsonExercise,
                                 @RequestParam("imageFile") MultipartFile imageFile) throws IOException {
         return this.exerciseService.save(jsonExercise, imageFile);
-    }
-
-    @GetMapping("/{id}")
-    public Exercise getExercise(@PathVariable Long id) {
-        return this.exerciseService.findById(id);
     }
 }

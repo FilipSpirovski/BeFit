@@ -59,14 +59,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/**").permitAll()
+                .antMatchers("/auth/register", "/auth/login", "/auth/current-user",
+                        "/exercises/count", "/forum/articles/all/{criteria}",
+                        "/forum/articles/{id}", "/forum/increment-views/{id}",
+                        "/meals/all/{criteria}", "/meals/count",
+                        "/meals/latest/{currentMealId}", "/meals/trending/{currentMealId}",
+                        "/meals/{id}", "/users/count", "/workouts/all/{criteria}",
+                        "/workouts/count", "/workouts/latest/{currentWorkoutPlanId}",
+                        "/workouts/trending/{currentWorkoutPlanId}", "/workouts/{id}",
+                        "/oauth/google", "/oauth/facebook").permitAll()
+                .antMatchers("/exercises/add").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(jwtEntryPoint)
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//                .and()
-//                .logout().logoutRequestMatcher(new AntPathRequestMatcher("**/auth/logout"));
 
         http.addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
