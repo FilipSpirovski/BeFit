@@ -29,7 +29,7 @@ public class Article {
 
     private LocalDateTime submissionTime;
 
-    private Integer views;
+    private Integer views = 0;
 
     @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<Comment> comments;

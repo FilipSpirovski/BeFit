@@ -25,7 +25,7 @@ public class Comment {
 
     private LocalDateTime submissionTime;
 
-    private Integer rating;
+    private Integer rating = 0;
 
     public Comment(String text, User submitter, Integer rating) {
         this.text = text;
