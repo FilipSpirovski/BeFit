@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService {
         if (text == null || text.isEmpty() || text.equals("none")) {
             mealsPage = this.mealRepository.findAllByCreator(userEmail, paging);
         } else {
-            mealsPage = this.mealRepository.findAllByCreatorAndTitleLike(userEmail, text, paging);
+            mealsPage = this.mealRepository.findAllByCreatorAndTitleLike(userEmail, "%" + text + "%", paging);
         }
 
         meals = mealsPage.getContent();
@@ -125,7 +125,7 @@ public class UserServiceImpl implements UserService {
         if (text == null || text.isEmpty()) {
             workoutPlansPage = this.workoutPlanRepository.findAllByCreator(email, paging);
         } else {
-            workoutPlansPage = this.workoutPlanRepository.findAllByCreatorAndTitleLike(email, text, paging);
+            workoutPlansPage = this.workoutPlanRepository.findAllByCreatorAndTitleLike(email, "%" + text + "%", paging);
         }
 
         workoutPlans = workoutPlansPage.getContent();
